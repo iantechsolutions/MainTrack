@@ -1,27 +1,13 @@
-//import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-// import { NextResponse } from "next/server";
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-// const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
-// const isProtectedAdmin = createRouteMatcher(["/dashboard/administration(.*)"]);
-// const isPublicRoute = createRouteMatcher(["/api/uploadthing(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
-import { clerkMiddleware } from '@clerk/nextjs/server'
+export default clerkMiddleware((auth, req) => {
+  if (new URL(req.url).pathname.startsWith("/api/app/v1")) {
+    return 
+  }
 
-export default clerkMiddleware()
-
-/* export default clerkMiddleware((auth, req) => {
-  // if (!isPublicRoute(req)) {
+  if (isProtectedRoute(req)) {
     auth().protect();
-    const role = auth()?.sessionClaims?.metadata.role;
-    if (isProtectedAdmin(req)) {
-      if (role != "admin") {
-        return NextResponse.redirect(new URL("/accessdenied", req.url));
-      }
-    }
-    if (isProtectedRoute(req)) {
-      if (role != "admin" && role != "user") {
-        return NextResponse.redirect(new URL("/accessdenied", req.url));
-      }
-    }
-  // }
-}); */
+  }
+})

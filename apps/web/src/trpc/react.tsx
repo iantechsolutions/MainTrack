@@ -6,6 +6,7 @@ import { createTRPCReact } from '@trpc/react-query'
 import { useState } from 'react'
 import SuperJSON from 'superjson'
 import type { AppRouter } from '~/server/api/root'
+import { getBaseUrl } from '~/server/utils'
 
 const createQueryClient = () => new QueryClient()
 
@@ -51,17 +52,4 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             </api.Provider>
         </QueryClientProvider>
     )
-}
-
-function getBaseUrl() {
-    if (typeof window !== 'undefined') {
-        return window.location.origin
-    }
-
-    if (process.env.VERCEL_URL) {
-        return `https://${process.env.VERCEL_URL}`
-    } else {
-        throw "getBaseUrl not configured";
-        // return `https://maintrack.vercel.app/`
-    }
 }
