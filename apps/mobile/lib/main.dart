@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:main_track/bloc/usuario_bloc.dart';
 import 'package:main_track/screens/login_screen.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {
-  FlutterError.onError = (details) {
-    FlutterError.presentError(details);
-  };
   runApp(const MyApp());
 }
 
@@ -16,7 +14,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [], // Blocs
+      providers: [
+        BlocProvider<UsuarioBloc>(create: (context) => UsuarioBloc()),
+      ], // Blocs
       child: ShadApp.material(
         theme: ShadThemeData(
             brightness: Brightness.dark,
