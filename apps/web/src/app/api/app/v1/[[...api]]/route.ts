@@ -5,6 +5,7 @@ import { env } from '~/env';
 import { createClerkClient } from '@clerk/backend';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
+import { api } from '~/trpc/server';
 
 export const runtime = 'edge';
 const app = new Hono().basePath('/api/app/v1');
@@ -12,7 +13,7 @@ const app = new Hono().basePath('/api/app/v1');
 const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
 
 app.use('*', clerkMiddleware());
-app.get('/p/test', async (c, _next) => {
+app.get('/p/test', async (c) => {
     const auth = getAuth(c)
 
     if (!auth?.userId) {
@@ -115,8 +116,24 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
     });
 })
 
-app.get('/p/usuarios/:Id', async (c) => {
+app.get('/p/org/usuarios', async (c) => {
+    return c.json(await api.org.listUsers());
+});
 
+app.get('/p/org', async (c) => {
+    return c.json(await api.org.get());
+});
+
+app.get('/p/org/remove/:userId', async (c) => {
+    return c.json(await api.org.removeUser({
+        userId: c.req.param('userId')
+    }));
+});
+
+app.get('/p/user/:Id', async (c) => {
+    return c.json(await api.user.get({
+        userId: c.req.param('Id')
+    }));
 });
 
 export const GET = app.fetch

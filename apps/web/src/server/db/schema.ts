@@ -6,13 +6,11 @@ const createTable = pgTableCreator((name) => `maintrack_${name}`)
 export const users = createTable(
     "user",
     {
-        Id: uuid("id")
+        Id: text("id")
             .notNull()
-            .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .primaryKey(),
         email: varchar("email", { length: 256 }).notNull(),
-        nombre: text("nombre"),
-        apellido: text("apellido"),
+        nombre: text("nombre").notNull(),
         rol: varchar("rol", { length: 256 }),
         orgSeleccionada: uuid("orgSeleccionada").references(() => organizaciones.Id, {
             onDelete: 'set null'
@@ -37,6 +35,10 @@ export const organizaciones = createTable(
         nombre: text("nombre"),
     },
 );
+
+export const organizacionesRelations = relations(organizaciones, ({ many }) => ({
+    users: many(users),
+}));
 
 export const equipos = createTable(
     "equipos",

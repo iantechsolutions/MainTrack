@@ -6,7 +6,7 @@ import { createTRPCReact } from '@trpc/react-query'
 import { useState } from 'react'
 import SuperJSON from 'superjson'
 import type { AppRouter } from '~/server/api/root'
-import { getBaseUrl } from '~/server/utils'
+import { getBaseUrl } from '~/server/utils/other'
 
 const createQueryClient = () => new QueryClient()
 

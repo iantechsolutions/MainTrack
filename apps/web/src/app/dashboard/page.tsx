@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 import React from 'react';
-import { getBaseUrl } from '~/server/utils';
+import { getBaseUrl } from '~/server/utils/other';
 import { api } from '~/trpc/server';
 
 export default async function Home() {
