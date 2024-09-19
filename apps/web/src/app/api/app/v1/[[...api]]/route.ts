@@ -1,3 +1,4 @@
+import 'server-only';
 import { Hono } from 'hono';
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { HTTPException } from 'hono/http-exception';
@@ -13,6 +14,10 @@ const app = new Hono().basePath('/api/app/v1');
 const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
 
 app.use('*', clerkMiddleware());
+app.get('/test', async (c) => {
+    return c.text("'hono test'");
+});
+
 app.get('/p/test', async (c) => {
     const auth = getAuth(c)
 
@@ -114,25 +119,50 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
         }),
         id: user.id
     });
-})
-
-app.get('/p/org/usuarios', async (c) => {
-    return c.json(await api.org.listUsers());
 });
 
-app.get('/p/org', async (c) => {
-    return c.json(await api.org.get());
+app.get('/p/org/usuarios/:orgId', async (c) => {
+    return c.json(await api.org.listUsers({
+        orgId: c.req.param('orgId'),
+    }));
 });
 
-app.get('/p/org/remove/:userId', async (c) => {
+app.get('/p/org/:orgId', async (c) => {
+    return c.json(await api.org.get({
+        orgId: c.req.param('orgId')
+    }));
+});
+
+app.get('/p/org/remove/:userId/:orgId', async (c) => {
     return c.json(await api.org.removeUser({
-        userId: c.req.param('userId')
+        userId: c.req.param('userId'),
+        orgId: c.req.param('orgId')
     }));
 });
 
 app.get('/p/user/:Id', async (c) => {
     return c.json(await api.user.get({
         userId: c.req.param('Id')
+    }));
+});
+
+app.get('/p/org/invite-email/:orgId/:userEmail', async (c) => {
+    return c.json(await api.org.inviteUser({
+        userEmail: c.req.param('userEmail'),
+        orgId: c.req.param('orgId')
+    }));
+});
+
+app.get('/p/org/invite-id/:orgId/:userId', async (c) => {
+    return c.json(await api.org.inviteUser({
+        userId: c.req.param('userId'),
+        orgId: c.req.param('orgId')
+    }));
+});
+
+app.get('/p/org/join/:token', async (c) => {
+    return c.json(await api.org.join({
+        token: c.req.param('token')
     }));
 });
 

@@ -1,7 +1,12 @@
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 export const testRouter = createTRPCRouter({
-    test: protectedProcedure.query(async () => {
-      return "'trpc test'";
-    })
+    testProt: protectedProcedure
+      .query(async () => {
+        return "'trpc test'";
+      }),
+    test: publicProcedure
+      .query(async () => {
+        return "'trpc test'";
+      })
 });

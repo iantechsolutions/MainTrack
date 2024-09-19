@@ -34,8 +34,9 @@
   },
   "devDependencies": {
     "@clerk/types": "^4.21.0",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -44,7 +45,12 @@
     "drizzle-kit": "^0.24.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.6",
+    "jsonwebtoken": "^9.0.2",
     "postgres": "^3.4.4",
     "typescript": "^5"
-  }
+  },
+  "trpc-openapi": {
+    "@trpc/server": "^11.0.0-next-beta.289"
+  },
+  "packageManager": "pnpm@9.6.0"
 }

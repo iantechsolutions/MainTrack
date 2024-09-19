@@ -15,6 +15,7 @@ export const env = createEnv({
         // GOOGLE_CLIENT_ID: z.string(),
         // GOOGLE_CLIENT_SECRET: z.string(),
         CLERK_SECRET_KEY: z.string(),
+        JWT_INVITE_KEY: z.string().refine((str) => str !== 'example'),
     },
 
     /**
@@ -39,6 +40,7 @@ export const env = createEnv({
         CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
         NEXT_PUBLIC_TEST: process.env.NEXT_PUBLIC_TEST,
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+        JWT_INVITE_KEY: process.env.JWT_INVITE_KEY
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

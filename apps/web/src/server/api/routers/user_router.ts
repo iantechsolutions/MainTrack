@@ -1,26 +1,19 @@
-import { db, schema } from "~/server/db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { z } from "zod";
-import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { getUserPublic } from "~/server/utils/other";
+import { getUser } from "~/server/utils/user";
 
 export const userRouter = createTRPCRouter({
-    get: protectedProcedure.input(
-            z.object({
-                userId: z.string(),
-            })
-        ).query(async ({ input }) => {
-            const user = await db.query.users.findFirst({
-                where: eq(schema.users.Id, input.userId)
-            });
+    get: protectedProcedure
+        .query(async ({ ctx }) => {
+            const selfId = ctx.session.user.id;
+            const user = getUser(selfId);
 
             if (!user) {
-                throw new TRPCError({ code: "NOT_FOUND" });
+                throw new TRPCError({code: 'NOT_FOUND'});
             }
 
             // excluyo el email
-            return getUserPublic(user);
+            return user;
         }),
     // el list de usuarios lo hice dependiente de la org (ver org_router)
 });

@@ -9,21 +9,32 @@ export const users = createTable(
         Id: text("id")
             .notNull()
             .primaryKey(),
-        email: varchar("email", { length: 256 }).notNull(),
-        nombre: text("nombre").notNull(),
-        rol: varchar("rol", { length: 256 }),
         orgSeleccionada: uuid("orgSeleccionada").references(() => organizaciones.Id, {
             onDelete: 'set null'
         })
     },
 );
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
     orgSeleccionada: one(organizaciones, {
         fields: [users.orgSeleccionada],
         references: [organizaciones.Id],
     }),
+    usuariosOrganizaciones: many(usuariosOrganizaciones)
 }));
+
+export const usuariosOrganizaciones = createTable(
+    "organizacion_usuarios",
+    {
+        userId: text("userId")
+            .notNull()
+            .references(() => users.Id),
+        rol: varchar("rol", { length: 256 }),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
+    },
+);
 
 export const organizaciones = createTable(
     "organizacion",
@@ -37,7 +48,18 @@ export const organizaciones = createTable(
 );
 
 export const organizacionesRelations = relations(organizaciones, ({ many }) => ({
-    users: many(users),
+    usuariosOrganizaciones: many(usuariosOrganizaciones),
+}));
+
+export const usuariosOrganizacionesRelations = relations(usuariosOrganizaciones, ({ one }) => ({
+    organizacion: one(organizaciones, {
+        fields: [usuariosOrganizaciones.orgId],
+        references: [organizaciones.Id],
+    }),
+    user: one(users, {
+        fields: [usuariosOrganizaciones.userId],
+        references: [users.Id],
+    }),
 }));
 
 export const equipos = createTable(

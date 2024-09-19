@@ -1,5 +1,4 @@
-import { InferSelectModel } from "drizzle-orm";
-import { schema } from "./db";
+import { UserMulti } from "./user";
 
 export function getBaseUrl() {
     if (typeof window !== 'undefined') {
@@ -18,16 +17,14 @@ export function getBaseUrl() {
 
 export type UserPublic = {
     Id: string,
-    nombre: string,
-    rol: string | null,
-    orgSeleccionada: string | null
+    nombre: string | null,
+    imageUrl: string | null,
 }
 
-export function getUserPublic(user: InferSelectModel<typeof schema.users>): UserPublic {
+export function getUserPublic(user: UserMulti): UserPublic {
     return {
-        Id: user.Id,
-        nombre: user.nombre,
-        orgSeleccionada: user.orgSeleccionada,
-        rol: user.rol
+        Id: user.user.Id,
+        nombre: user.clerkUser.username,
+        imageUrl: user.clerkUser.imageUrl,
     }
 }
