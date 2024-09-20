@@ -2,17 +2,15 @@
 import { Hono } from 'hono';
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { HTTPException } from 'hono/http-exception';
-import { env } from '~/env';
-import { createClerkClient } from '@clerk/backend';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { api } from '~/trpc/server';
 import { UserRolesEnum } from '~/server/utils/roles';
+import { clerkClient } from '@clerk/nextjs/server';
 
 // export const runtime = 'edge';
 const app = new Hono().basePath('/api/app/v1');
 
-const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
 
 app.use('*', clerkMiddleware());
 app.get('/test', async (c) => {
@@ -43,7 +41,7 @@ app.post('/signup', zValidator('json', schemaSignup), async (c) => {
     }
 
     const data = c.req.valid('json');
-    const user = await clerkClient.users.createUser({
+    const user = await clerkClient().users.createUser({
         firstName: data.firstName,
         lastName: data.lastName,
         emailAddress: [data.emailAddress],
@@ -53,7 +51,7 @@ app.post('/signup', zValidator('json', schemaSignup), async (c) => {
     // ojo, signInToken no es lo mismo que session token
     // ejemplo: https://clerk.com/docs/custom-flows/embedded-email-links
     return c.json({
-        signInToken: await clerkClient.signInTokens.createSignInToken({
+        signInToken: await clerkClient().signInTokens.createSignInToken({
             userId: user.id,
             expiresInSeconds: 60 * 60 * 24 * 30,
         }),
@@ -74,7 +72,7 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
     }
 
     const data = c.req.valid('json');
-    const users = await clerkClient.users.getUserList({
+    const users = await clerkClient().users.getUserList({
         emailAddress: [data.emailAddress]
     });
 
@@ -89,7 +87,7 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
         }
     }
 
-    const validPassword = await clerkClient.users.verifyPassword({
+    const validPassword = await clerkClient().users.verifyPassword({
         password: data.password,
         userId: user.id,
     });
@@ -103,7 +101,7 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
             throw new HTTPException(403, { message: 'Invalid Credentials' });
         }
 
-        const validTotp = await clerkClient.users.verifyTOTP({
+        const validTotp = await clerkClient().users.verifyTOTP({
             code: data.totp,
             userId: user.id,
         });
@@ -114,7 +112,7 @@ app.post('/signin', zValidator('json', schemaSignin), async (c) => {
     }
 
     return c.json({
-        signInToken: await clerkClient.signInTokens.createSignInToken({
+        signInToken: await clerkClient().signInTokens.createSignInToken({
             userId: user.id,
             expiresInSeconds: 60 * 60 * 24 * 30,
         }),

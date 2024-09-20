@@ -9,7 +9,7 @@ export type UserMulti = {
 };
 
 export const getUser = async (id: string): Promise<UserMulti | null> => {
-    const clerkUser = await clerkClient.users.getUser(id);
+    const clerkUser = await clerkClient().users.getUser(id);
     let user = await db.query.users.findFirst({
         where: eq(schema.users.Id, id)
     });
@@ -38,7 +38,7 @@ export const getUser = async (id: string): Promise<UserMulti | null> => {
 }
 
 export const getUserByEmail = async (email: string): Promise<UserMulti | null> => {
-    const users = await clerkClient.users.getUserList({
+    const users = await clerkClient().users.getUserList({
         emailAddress: [email]
     });
 

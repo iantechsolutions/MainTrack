@@ -28,7 +28,7 @@ export const userRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
             try {
-                const res = await clerkClient.users.updateUser(selfId, {
+                const res = await clerkClient().users.updateUser(selfId, {
                     firstName: input.firstName ?? undefined,
                     lastName: input.lastName ?? undefined,
                     username: input.username ?? undefined,
