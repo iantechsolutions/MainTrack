@@ -3,9 +3,6 @@ await import('./src/env.js')
 
 /** @type {import("next").NextConfig} */
 const nextconfig = {
-    experimental: {
-        esmExternals: 'loose',
-    },
     webpack: (config, { webpack }) => {
         // Add externalsPresets configuration
         config.externalsPresets = {

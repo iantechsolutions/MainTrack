@@ -10,4 +10,5 @@ export default {
     authToken: env.DATABASE_AUTH_TOKEN,
   },
   tablesFilter: ["web_*"],
+  dialect: 'sqlite',
 } satisfies Config;

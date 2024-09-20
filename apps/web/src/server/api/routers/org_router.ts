@@ -4,12 +4,174 @@ import { z } from "zod";
 import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { getUserPublic } from "~/server/utils/other";
-import { UserRoles } from "~/server/utils/roles";
-// import jwt from 'jsonwebtoken';
+import { UserRoles, UserRolesEnum } from "~/server/utils/roles";
+import jwt from 'jsonwebtoken';
 import { env } from "~/env";
 import { getUser, getUserByEmail } from "~/server/utils/user";
 
 export const orgRouter = createTRPCRouter({
+    create: protectedProcedure
+        .input(z.object({
+            name: z.string().min(1).max(1024),
+            seleccionar: z.boolean().default(false),
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const selfId = ctx.session.user.id;
+
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+            let selfUser = selfUserB.user;
+
+            let orgs = await db.insert(schema.organizaciones)
+                .values({
+                    nombre: input.name
+                })
+                .returning();
+            
+            if (orgs.length < 1) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+            }
+
+            let org = orgs[0];
+            // redundante pero el linter se queja
+            if (!org) {
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+            }
+
+            let userOrg = await db.insert(schema.usuariosOrganizaciones)
+                .values({
+                    orgId: org.Id,
+                    userId: selfUser.Id,
+                    rol: UserRoles.orgAdmin
+                })
+                .returning();
+
+            // raro que pase pero si pasa deshago todo
+            if (userOrg.length < 1) {
+                await db.delete(schema.organizaciones)
+                    .where(eq(schema.organizaciones.Id, org.Id));
+                throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
+            }
+
+            if (input.seleccionar) {
+                await db.update(schema.users)
+                    .set({
+                        orgSeleccionada: org.Id,
+                    })
+                    .where(eq(schema.users.Id, selfUser.Id));
+            }
+
+            return org;
+        }),
+    edit: protectedProcedure
+        .input(z.object({
+            orgId: z.string(),
+            name: z.string().min(1).max(1024)
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const selfId = ctx.session.user.id;
+            const { orgId } = input;
+
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            let org = await db.query.organizaciones.findFirst({
+                where: eq(schema.organizaciones.Id, orgId)
+            });
+
+            if (!org) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, org.Id),
+                    eq(schema.usuariosOrganizaciones.userId, selfId)
+                )
+            });
+
+            if (!orgUserEntry) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            } else if (orgUserEntry.rol !== UserRoles.orgAdmin) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            return await db.update(schema.organizaciones)
+                .set({
+                    nombre: input.name
+                })
+                .where(eq(schema.organizaciones.Id, org.Id))
+                .returning();
+        }),
+    delete: protectedProcedure
+        .input(z.object({
+            orgId: z.string()
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const selfId = ctx.session.user.id;
+            const { orgId } = input;
+
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            let org = await db.query.organizaciones.findFirst({
+                where: eq(schema.organizaciones.Id, orgId)
+            });
+
+            if (!org) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, org.Id),
+                    eq(schema.usuariosOrganizaciones.userId, selfId)
+                )
+            });
+
+            if (!orgUserEntry) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            } else if (orgUserEntry.rol !== UserRoles.orgAdmin) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            let orgUserEntries = await db.query.usuariosOrganizaciones.findMany({
+                with: {
+                    user: true
+                },
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, org.Id),
+                )
+            });
+
+            // saca a todos los usuarios
+            await db.delete(schema.usuariosOrganizaciones)
+                .where(eq(schema.usuariosOrganizaciones.orgId, org.Id));
+
+            // esto no necesita recorrer la tabla entera
+            // cosa que un update para todos los orgSeleccionada === org.Id sí haría
+            for (let orgUser of orgUserEntries) {
+                if (orgUser.user.orgSeleccionada === org.Id) {
+                    await db.update(schema.users)
+                        .set({
+                            orgSeleccionada: null
+                        })
+                        .where(eq(schema.users.Id, orgUser.userId));
+                }
+            }
+
+            // borra la org
+            await db.delete(schema.organizaciones)
+                .where(eq(schema.organizaciones.Id, org.Id));
+
+            return "ok";
+        }),
     get: protectedProcedure
         .input(z.object({
             orgId: z.string()
@@ -18,11 +180,8 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
@@ -50,18 +209,21 @@ export const orgRouter = createTRPCRouter({
     list: protectedProcedure
         .query(async ({ ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
             let orgs = await db.query.usuariosOrganizaciones.findMany({
                 with: {
                     organizacion: {
-                        
+                        with: {
+                            usuariosOrganizaciones: {
+                                with: {
+                                    user: true
+                                }
+                            }
+                        }
                     }
                 },
                 where: eq(schema.usuariosOrganizaciones.userId, selfId)
@@ -75,11 +237,8 @@ export const orgRouter = createTRPCRouter({
         }))
         .query(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
@@ -98,17 +257,20 @@ export const orgRouter = createTRPCRouter({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, input.orgId),
                 ),
-                with: {
-                    user: true
-                }
             });
 
             let usersDetailed = [];
             for (let user of orgUsers) {
-                usersDetailed.push(await getUser(user.userId));
+                usersDetailed.push({
+                    profile: await getUser(user.userId),
+                    orgUser: user
+                });
             }
     
-            return usersDetailed.map((entry) => entry ? getUserPublic(entry) : null);
+            return usersDetailed.map((entry) => entry.profile ? {
+                profile: getUserPublic(entry.profile),
+                orgUser: entry.orgUser
+            } : null);
         }),
     inviteUser: protectedProcedure
         .input(
@@ -120,14 +282,11 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
+            let selfUser = selfUserB.user;
 
             let userId;
             if (input.userEmail) {
@@ -188,15 +347,15 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            // let token = jwt.sign({
-            //     orgId: orgSelfEntry.orgId,
-            //     targetUserId: targetUser.Id,
-            //     fromUserId: selfUser.Id
-            // }, env.JWT_INVITE_KEY, {
-            //     algorithm: 'ES256'
-            // });
+            let token = jwt.sign({
+                orgId: orgSelfEntry.orgId,
+                targetUserId: targetUser.Id,
+                fromUserId: selfUser.Id
+            }, env.JWT_INVITE_KEY, {
+                algorithm: 'ES256'
+            });
 
-            return "token";
+            return token;
         }),
     join: protectedProcedure
         .input(
@@ -206,76 +365,73 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            // let tokenClaims;
-            // try {
-            //     tokenClaims = jwt.verify(input.token, env.JWT_INVITE_KEY);
-            // } catch (_) {
-            //     throw new TRPCError({ code: "BAD_REQUEST" });
-            // }
+            let tokenClaims;
+            try {
+                tokenClaims = jwt.verify(input.token, env.JWT_INVITE_KEY);
+            } catch (_) {
+                throw new TRPCError({ code: "BAD_REQUEST" });
+            }
 
-            // if (typeof tokenClaims !== 'object') {
-            //     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-            // }
+            if (typeof tokenClaims !== 'object') {
+                throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+            }
 
-            // if (typeof tokenClaims.orgId !== 'string' || typeof tokenClaims.targetUserId !== 'string' || typeof tokenClaims.fromUserId !== 'string') {
-            //     throw new TRPCError({ code: "BAD_REQUEST" });
-            // }
+            if (typeof tokenClaims.orgId !== 'string' || typeof tokenClaims.targetUserId !== 'string' || typeof tokenClaims.fromUserId !== 'string') {
+                throw new TRPCError({ code: "BAD_REQUEST" });
+            }
 
-            // if (tokenClaims.targetUserId !== selfId) {
-            //     throw new TRPCError({ code: "BAD_REQUEST" });
-            // }
+            if (tokenClaims.targetUserId !== selfId) {
+                throw new TRPCError({ code: "BAD_REQUEST" });
+            }
 
-            // let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
-            //     with: {
-            //         organizacion: true,
-            //     },
-            //     where: and(
-            //         eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
-            //         eq(schema.usuariosOrganizaciones.userId, tokenClaims.fromUserId)
-            //     )
-            // });
+            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+                with: {
+                    organizacion: true,
+                },
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
+                    eq(schema.usuariosOrganizaciones.userId, tokenClaims.fromUserId)
+                )
+            });
 
-            // if (!orgSelfEntry) {
-            //     throw new TRPCError({ code: "NOT_FOUND" });
-            // } else if (orgSelfEntry.rol !== UserRoles.orgAdmin) {
-            //     throw new TRPCError({ code: "FORBIDDEN" });
-            // }
+            if (!orgSelfEntry) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            } else if (orgSelfEntry.rol !== UserRoles.orgAdmin) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
 
-            // let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
-            //     with: {
-            //         user: true
-            //     },
-            //     where: and(
-            //         eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
-            //         eq(schema.usuariosOrganizaciones.userId, tokenClaims.targetUserId)
-            //     )
-            // });
+            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+                with: {
+                    user: true
+                },
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
+                    eq(schema.usuariosOrganizaciones.userId, tokenClaims.targetUserId)
+                )
+            });
 
-            // if (orgUserEntry) {
-            //     throw new TRPCError({ code: "CONFLICT" });
-            // }
+            if (orgUserEntry) {
+                throw new TRPCError({ code: "CONFLICT" });
+            }
 
-            // let targetUser = await db.query.users.findFirst({
-            //     where: eq(schema.users.Id, tokenClaims.targetUserId)
-            // });
+            let targetUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, tokenClaims.targetUserId)
+            });
 
-            // if (!targetUser) {
-            //     throw new TRPCError({ code: "NOT_FOUND" });
-            // }
+            if (!targetUser) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
 
-            // await db.insert(schema.usuariosOrganizaciones).values({
-            //     orgId: orgSelfEntry.organizacion.Id,
-            //     userId: targetUser.Id,
-            //     rol: UserRoles.none,
-            // });
+            await db.insert(schema.usuariosOrganizaciones).values({
+                orgId: orgSelfEntry.organizacion.Id,
+                userId: targetUser.Id,
+                rol: UserRoles.none,
+            });
 
             return "ok";
         }),
@@ -288,13 +444,12 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, selfId)
-            });
-
-            if (!selfUser) {
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
+
+            let selfUser = selfUserB.user;
 
             /* if (selfId === input.userId) {
                 throw new TRPCError({ code: "BAD_REQUEST" });
@@ -368,9 +523,126 @@ export const orgRouter = createTRPCRouter({
 
             if (otherUser.orgSeleccionada === org.Id) {
                 await db.update(schema.users).set({
-                    orgSeleccionada: undefined
+                    orgSeleccionada: null
                 }).where(eq(schema.users.Id, otherUser.Id));
             }
+
+            return "ok";
+        }),
+    setRole: protectedProcedure
+        .input(
+            z.object({
+                userId: z.string(),
+                orgId: z.string(),
+                role: z.enum(UserRolesEnum)
+            })
+        )
+        .mutation(async ({ input, ctx }) => {
+            const selfId = ctx.session.user.id;
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            let selfUser = selfUserB.user;
+
+            /* if (selfId === input.userId) {
+                throw new TRPCError({ code: "BAD_REQUEST" });
+            } */
+            // Nota: puede sacarse a si mismo si es admin, solo que no puede ser el ultimo admin en salir
+
+            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+                with: {
+                    organizacion: {
+                        with: {
+                            usuariosOrganizaciones: {
+                                with: {
+                                    user: true
+                                }
+                            }
+                        }
+                    },
+                },
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, input.orgId),
+                    eq(schema.usuariosOrganizaciones.userId, selfId)
+                )
+            });
+
+            if (!orgSelfEntry) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+                with: {
+                    user: true
+                },
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, input.orgId),
+                    eq(schema.usuariosOrganizaciones.userId, input.userId)
+                )
+            });
+
+            if (!orgUserEntry) {
+                throw new TRPCError({ code: "BAD_REQUEST" });
+            }
+            
+            const otherUser = orgUserEntry.user;
+            const org = orgSelfEntry.organizacion;
+
+            if (otherUser.Id === selfUser.Id) {
+                throw new TRPCError({ code: "CONFLICT" });
+            } else if (orgSelfEntry.rol !== UserRoles.orgAdmin) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            return await db.update(schema.usuariosOrganizaciones)
+                .set({
+                    rol: input.role // validación con zod en el input
+                })
+                .where(and(
+                    eq(schema.usuariosOrganizaciones.orgId, org.Id),
+                    eq(schema.usuariosOrganizaciones.userId, otherUser.Id)
+                ))
+                .returning();
+        }),
+    select: protectedProcedure
+        .input(z.object({
+            orgId: z.string()
+        }))
+        .mutation(async ({ input, ctx }) => {
+            const selfId = ctx.session.user.id;
+            const { orgId } = input;
+
+            let selfUserB = await getUser(selfId);
+            if (!selfUserB) {
+                throw new TRPCError({ code: "UNAUTHORIZED" });
+            }
+
+            let org = await db.query.organizaciones.findFirst({
+                where: eq(schema.organizaciones.Id, orgId)
+            });
+
+            if (!org) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+                where: and(
+                    eq(schema.usuariosOrganizaciones.orgId, org.Id),
+                    eq(schema.usuariosOrganizaciones.userId, selfUserB.user.Id)
+                )
+            });
+
+            if (!orgUserEntry) {
+                throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            await db.update(schema.users)
+                .set({
+                    orgSeleccionada: org.Id
+                })
+                .where(eq(schema.users.Id, selfUserB.user.Id));
 
             return "ok";
         }),

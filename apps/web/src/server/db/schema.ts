@@ -4,11 +4,9 @@ import { int, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core"
 
 const createTable = sqliteTableCreator((name) => `maintrack_${name}`)
 
-// const uui = text("id", { length: 36 }).primaryKey().$defaultFn(() => randomUUID());
 function uuid(name:string){
-    return text(name, { length: 36 }).$defaultFn(() => nanoid());
+    return text(name, { length: 36 });
 }
-
 
 export const users = createTable(
     "user",
@@ -17,7 +15,6 @@ export const users = createTable(
             .notNull()
             .primaryKey(),
         orgSeleccionada: uuid("orgSeleccionada")
-        
     },
 );
 
@@ -48,7 +45,7 @@ export const organizaciones = createTable(
         Id: uuid("id")
             .notNull()
             .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .$defaultFn(() => nanoid()),
         nombre: text("nombre"),
     },
 );
@@ -74,7 +71,7 @@ export const equipos = createTable(
         Id: uuid("id")
             .notNull()
             .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .$defaultFn(() => nanoid()),
         nombre: text("nombre"),
         codigo: text("codigo"),
         tipoEquipoId: uuid("tipoEquipoId").references(() => tiposEquipos.Id)
@@ -94,7 +91,7 @@ export const tiposEquipos = createTable(
         Id: uuid("id")
             .notNull()
             .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .$defaultFn(() => nanoid()),
         nombreCategoria: text("nombreCategoria").notNull(),
     },
 );
@@ -105,7 +102,7 @@ export const ots = createTable(
         Id: uuid("id")
             .notNull()
             .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .$defaultFn(() => nanoid()),
         isTemplate: int("isTemplate",{mode: "boolean"}).default(false),
         nombre: text("nombre").notNull(),
         tipo: text("tipo").notNull(),
@@ -134,7 +131,7 @@ export const intervenciones = createTable(
         Id: uuid("id")
             .notNull()
             .primaryKey()
-            .$default(() => crypto.randomUUID()),
+            .$defaultFn(() => nanoid()),
         idUsuario: uuid("idUsuario").notNull().references(() => users.Id),
         idOT: uuid("idOT").notNull().references(() => ots.Id),
         fechaLimite: int("fecha",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),

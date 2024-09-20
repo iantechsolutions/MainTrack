@@ -16,7 +16,7 @@ export const env = createEnv({
         // GOOGLE_CLIENT_SECRET: z.string(),
         CLERK_SECRET_KEY: z.string(),
         JWT_INVITE_KEY: z.string().refine((str) => str !== 'example'),
-        DATABASE_AUTH_TOKEN: z.string()
+        DATABASE_AUTH_TOKEN: z.string().refine((str) => str !== 'example'),
     },
 
     /**
