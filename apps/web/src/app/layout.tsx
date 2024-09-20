@@ -18,6 +18,8 @@ export default function RootLayout({
       <html lang='es'>
         <TRPCReactProvider>
           <body>
+            <h1>TITULO</h1>
+            <h1>SIDENAV</h1>
             {children}
           </body>
         </TRPCReactProvider>
