@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "main_track" "\0"
+            VALUE "CompanyName", "com.iantech.checkflow" "\0"
+            VALUE "FileDescription", "mplikelanding" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "main_track" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "main_track.exe" "\0"
-            VALUE "ProductName", "main_track" "\0"
+            VALUE "InternalName", "mplikelanding" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.iantech.checkflow. All rights reserved." "\0"
+            VALUE "OriginalFilename", "mplikelanding.exe" "\0"
+            VALUE "ProductName", "mplikelanding" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

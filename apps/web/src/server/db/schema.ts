@@ -1,7 +1,14 @@
-import { relations } from "drizzle-orm";
-import { boolean, integer, pgTableCreator, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { nanoid } from "nanoid";
+import { relations, sql } from "drizzle-orm";
+import { int, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
 
-const createTable = pgTableCreator((name) => `maintrack_${name}`)
+const createTable = sqliteTableCreator((name) => `maintrack_${name}`)
+
+// const uui = text("id", { length: 36 }).primaryKey().$defaultFn(() => randomUUID());
+function uuid(name:string){
+    return text(name, { length: 36 }).$defaultFn(() => nanoid());
+}
+
 
 export const users = createTable(
     "user",
@@ -9,9 +16,8 @@ export const users = createTable(
         Id: text("id")
             .notNull()
             .primaryKey(),
-        orgSeleccionada: uuid("orgSeleccionada").references(() => organizaciones.Id, {
-            onDelete: 'set null'
-        })
+        orgSeleccionada: uuid("orgSeleccionada")
+        
     },
 );
 
@@ -29,7 +35,7 @@ export const usuariosOrganizaciones = createTable(
         userId: text("userId")
             .notNull()
             .references(() => users.Id),
-        rol: varchar("rol", { length: 256 }),
+        rol: text("rol", { length: 256 }),
         orgId: uuid("orgId")
             .notNull()
             .references(() => organizaciones.Id)
@@ -100,10 +106,10 @@ export const ots = createTable(
             .notNull()
             .primaryKey()
             .$default(() => crypto.randomUUID()),
-        isTemplate: boolean("isTemplate").default(false),
+        isTemplate: int("isTemplate",{mode: "boolean"}).default(false),
         nombre: text("nombre").notNull(),
         tipo: text("tipo").notNull(),
-        fecha: timestamp("fecha").defaultNow(),
+        fecha: int("fecha",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
         daysLimit: integer("daysLimit").notNull(),
         daysPeriod: integer("daysPeriod"),
         // solo si es template
@@ -131,7 +137,7 @@ export const intervenciones = createTable(
             .$default(() => crypto.randomUUID()),
         idUsuario: uuid("idUsuario").notNull().references(() => users.Id),
         idOT: uuid("idOT").notNull().references(() => ots.Id),
-        fechaLimite: timestamp("fecha").notNull(),
+        fechaLimite: int("fecha",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
         status: text("status"),
     },
 );

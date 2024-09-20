@@ -5,7 +5,7 @@ import { and, eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { getUserPublic } from "~/server/utils/other";
 import { UserRoles } from "~/server/utils/roles";
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 import { env } from "~/env";
 import { getUser, getUserByEmail } from "~/server/utils/user";
 
@@ -188,15 +188,15 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            let token = jwt.sign({
-                orgId: orgSelfEntry.orgId,
-                targetUserId: targetUser.Id,
-                fromUserId: selfUser.Id
-            }, env.JWT_INVITE_KEY, {
-                algorithm: 'ES256'
-            });
+            // let token = jwt.sign({
+            //     orgId: orgSelfEntry.orgId,
+            //     targetUserId: targetUser.Id,
+            //     fromUserId: selfUser.Id
+            // }, env.JWT_INVITE_KEY, {
+            //     algorithm: 'ES256'
+            // });
 
-            return token;
+            return "token";
         }),
     join: protectedProcedure
         .input(
@@ -214,68 +214,68 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let tokenClaims;
-            try {
-                tokenClaims = jwt.verify(input.token, env.JWT_INVITE_KEY);
-            } catch (_) {
-                throw new TRPCError({ code: "BAD_REQUEST" });
-            }
+            // let tokenClaims;
+            // try {
+            //     tokenClaims = jwt.verify(input.token, env.JWT_INVITE_KEY);
+            // } catch (_) {
+            //     throw new TRPCError({ code: "BAD_REQUEST" });
+            // }
 
-            if (typeof tokenClaims !== 'object') {
-                throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-            }
+            // if (typeof tokenClaims !== 'object') {
+            //     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+            // }
 
-            if (typeof tokenClaims.orgId !== 'string' || typeof tokenClaims.targetUserId !== 'string' || typeof tokenClaims.fromUserId !== 'string') {
-                throw new TRPCError({ code: "BAD_REQUEST" });
-            }
+            // if (typeof tokenClaims.orgId !== 'string' || typeof tokenClaims.targetUserId !== 'string' || typeof tokenClaims.fromUserId !== 'string') {
+            //     throw new TRPCError({ code: "BAD_REQUEST" });
+            // }
 
-            if (tokenClaims.targetUserId !== selfId) {
-                throw new TRPCError({ code: "BAD_REQUEST" });
-            }
+            // if (tokenClaims.targetUserId !== selfId) {
+            //     throw new TRPCError({ code: "BAD_REQUEST" });
+            // }
 
-            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
-                with: {
-                    organizacion: true,
-                },
-                where: and(
-                    eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
-                    eq(schema.usuariosOrganizaciones.userId, tokenClaims.fromUserId)
-                )
-            });
+            // let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+            //     with: {
+            //         organizacion: true,
+            //     },
+            //     where: and(
+            //         eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
+            //         eq(schema.usuariosOrganizaciones.userId, tokenClaims.fromUserId)
+            //     )
+            // });
 
-            if (!orgSelfEntry) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            } else if (orgSelfEntry.rol !== UserRoles.orgAdmin) {
-                throw new TRPCError({ code: "FORBIDDEN" });
-            }
+            // if (!orgSelfEntry) {
+            //     throw new TRPCError({ code: "NOT_FOUND" });
+            // } else if (orgSelfEntry.rol !== UserRoles.orgAdmin) {
+            //     throw new TRPCError({ code: "FORBIDDEN" });
+            // }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
-                with: {
-                    user: true
-                },
-                where: and(
-                    eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
-                    eq(schema.usuariosOrganizaciones.userId, tokenClaims.targetUserId)
-                )
-            });
+            // let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            //     with: {
+            //         user: true
+            //     },
+            //     where: and(
+            //         eq(schema.usuariosOrganizaciones.orgId, tokenClaims.orgId),
+            //         eq(schema.usuariosOrganizaciones.userId, tokenClaims.targetUserId)
+            //     )
+            // });
 
-            if (orgUserEntry) {
-                throw new TRPCError({ code: "CONFLICT" });
-            }
+            // if (orgUserEntry) {
+            //     throw new TRPCError({ code: "CONFLICT" });
+            // }
 
-            let targetUser = await db.query.users.findFirst({
-                where: eq(schema.users.Id, tokenClaims.targetUserId)
-            });
+            // let targetUser = await db.query.users.findFirst({
+            //     where: eq(schema.users.Id, tokenClaims.targetUserId)
+            // });
 
-            if (!targetUser) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
+            // if (!targetUser) {
+            //     throw new TRPCError({ code: "NOT_FOUND" });
+            // }
 
-            await db.insert(schema.usuariosOrganizaciones).values({
-                orgId: orgSelfEntry.organizacion.Id,
-                userId: targetUser.Id,
-                rol: UserRoles.none,
-            });
+            // await db.insert(schema.usuariosOrganizaciones).values({
+            //     orgId: orgSelfEntry.organizacion.Id,
+            //     userId: targetUser.Id,
+            //     rol: UserRoles.none,
+            // });
 
             return "ok";
         }),
@@ -368,7 +368,7 @@ export const orgRouter = createTRPCRouter({
 
             if (otherUser.orgSeleccionada === org.Id) {
                 await db.update(schema.users).set({
-                    orgSeleccionada: null
+                    orgSeleccionada: undefined
                 }).where(eq(schema.users.Id, otherUser.Id));
             }
 

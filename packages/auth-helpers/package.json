@@ -1,0 +1,12 @@
+{
+    "name": "auth-helpers",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "dependencies": {
+        "@auth0/nextjs-auth0": "^3.5.0"
+    },
+    "devDependencies": {
+        "tsconfig": "workspace:*"
+    }
+}

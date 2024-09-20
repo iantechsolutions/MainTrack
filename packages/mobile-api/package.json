@@ -1,0 +1,13 @@
+{
+    "name": "mobile-api",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "dependencies": {
+        "hono": "^4.2.3",
+        "auth-helpers": "workspace:*"
+    },
+    "devDependencies": {
+        "tsconfig": "workspace:*"
+    }
+}

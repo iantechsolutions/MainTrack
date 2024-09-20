@@ -1,4 +1,4 @@
-import 'server-only';
+// import 'server-only';
 import { Hono } from 'hono';
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { HTTPException } from 'hono/http-exception';
@@ -8,7 +8,7 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { api } from '~/trpc/server';
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 const app = new Hono().basePath('/api/app/v1');
 
 const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
@@ -141,9 +141,11 @@ app.get('/p/org/remove/:userId/:orgId', async (c) => {
 });
 
 app.get('/p/user/:Id', async (c) => {
-    return c.json(await api.user.get({
-        userId: c.req.param('Id')
-    }));
+    return c.json(await api.user.get(
+        // {
+        // userId: c.req.param('Id')
+    // }
+    ));
 });
 
 app.get('/p/org/invite-email/:orgId/:userEmail', async (c) => {

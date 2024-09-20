@@ -4,9 +4,10 @@ import { env } from "~/env";
 
 export default {
   schema: "./src/server/db/schema.ts",
-  dialect: "postgresql",
+  driver: "turso",
   dbCredentials: {
-    url: env.POSTGRES_URL,
+    url: env.DATABASE_URL,
+    authToken: env.DATABASE_AUTH_TOKEN,
   },
-  tablesFilter: ["bitcompay_*"],
+  tablesFilter: ["web_*"],
 } satisfies Config;

@@ -1,11 +1,11 @@
 {
-    "name": "main_track",
-    "short_name": "main_track",
+    "name": "mplikelanding",
+    "short_name": "mplikelanding",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A new app with the same vibes as mercado pago.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

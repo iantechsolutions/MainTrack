@@ -1,0 +1,24 @@
+{
+    "name": "tailwind-config",
+    "version": "0.1.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./native": "./native.ts",
+        "./web": "./web.ts"
+    },
+    "license": "MIT",
+    "scripts": {
+        "clean": "rm -rf .turbo node_modules",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "postcss": "^8.4.38",
+        "tailwindcss": "^3.4.1",
+        "tailwindcss-animate": "^1.0.7"
+    },
+    "devDependencies": {
+        "tsconfig": "workspace:*",
+        "typescript": "^5.4.3"
+    }
+}

@@ -1,6 +1,6 @@
-# main_track
+# mplikelanding
 
-A new Flutter project.
+A new app with the same vibes as mercado pago.
 
 ## Getting Started
 
