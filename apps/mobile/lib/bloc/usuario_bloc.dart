@@ -24,6 +24,12 @@ class UsuarioBloc extends Bloc<UsuarioEvent, UsuarioState> {
             ? UsuarioFetched(usuario: usuario)
             : UsuarioNotFound());
       }
+      if (event is Initial || event is UsuarioList || event is UsuariosRefresh) {
+        print('Fetching usuarios...');
+        List<Usuario> usuarios = await _getUsuariosFromApi();
+        print('Fetched ${usuarios.length} usuarios');
+        emit(UsuariosFetched(usuarios: usuarios));
+      }
     });
   }
 

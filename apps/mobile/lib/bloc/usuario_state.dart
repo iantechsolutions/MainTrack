@@ -13,6 +13,15 @@ class UsuarioInitial extends UsuarioState {}
 
 class UsuarioNotFound extends UsuarioState {}
 
+class UsuariosFetched extends UsuarioState {
+  const UsuariosFetched({required this.usuarios});
+
+  final List<Usuario> usuarios;
+
+  @override
+  List<Object> get props => [usuarios];
+}
+
 class UsuarioFetched extends UsuarioState {
   const UsuarioFetched({required this.usuario});
 

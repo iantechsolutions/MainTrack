@@ -17,3 +17,8 @@ class UsuarioDetails extends UsuarioEvent {
   @override
   List<Object> get props => [usuarioId];
 }
+
+
+class UsuarioList extends UsuarioEvent {}
+
+class UsuariosRefresh extends UsuarioEvent {}
