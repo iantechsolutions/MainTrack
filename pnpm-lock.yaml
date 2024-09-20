@@ -55,16 +55,16 @@ importers:
         version: 5.29.0(react@18.2.0)
       '@trpc/client':
         specifier: next
-        version: 11.0.0-rc.520(@trpc/server@11.0.0-rc.520)
+        version: 11.0.0-rc.522(@trpc/server@11.0.0-rc.522)
       '@trpc/next':
         specifier: next
-        version: 11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/react-query@11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/server@11.0.0-rc.520)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@trpc/server@11.0.0-rc.520)(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/react-query@11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/server@11.0.0-rc.522)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@trpc/server@11.0.0-rc.522)(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@trpc/react-query':
         specifier: next
-        version: 11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/server@11.0.0-rc.520)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+        version: 11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/server@11.0.0-rc.522)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@trpc/server':
         specifier: next
-        version: 11.0.0-rc.520
+        version: 11.0.0-rc.522
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
@@ -141,23 +141,29 @@ importers:
       auth-helpers:
         specifier: workspace:*
         version: link:../../packages/auth-helpers
+      autoprefixer:
+        specifier: ^10.4.20
+        version: 10.4.20(postcss@8.4.38)
       drizzle-kit:
         specifier: ^0.24.2
         version: 0.24.2
       drizzle-orm:
         specifier: ^0.33.0
         version: 0.33.0(@libsql/client@0.6.0)(@types/better-sqlite3@7.6.9)(@types/react@18.2.61)(react@18.2.0)
+      i:
+        specifier: ^0.3.7
+        version: 0.3.7
       mobile-api:
         specifier: workspace:*
         version: link:../../packages/mobile-api
       postcss:
-        specifier: ^8.4.34
+        specifier: ^8.4.38
         version: 8.4.38
       tailwind-config:
         specifier: workspace:*
         version: link:../../tooling/tailwind
       tailwindcss:
-        specifier: ^3.4.1
+        specifier: ^3.4.3
         version: 3.4.3
       tsconfig:
         specifier: workspace:*
@@ -859,18 +865,18 @@ packages:
     peerDependencies:
       react: ^18.0.0
 
-  '@trpc/client@11.0.0-rc.520':
-    resolution: {integrity: sha512-k0VSWNztpc+f0YegKBAh2zRd1EXcqnxusUNxY50KzV+Sq4Gzzwo0k8u6UvWbghn/QkJp3s/SJ8IcVHE5epuLgA==}
+  '@trpc/client@11.0.0-rc.522':
+    resolution: {integrity: sha512-MvlsLF5nVRSPRRLyqu0CUJr+yk6CNY8f1YoPHy25CDX0a/dtGohXd8UAj5pBfQTRcoRB91rGpKpxTg6qw23fVg==}
     peerDependencies:
-      '@trpc/server': 11.0.0-rc.520+de3ae0ae1
+      '@trpc/server': 11.0.0-rc.522+b99c8b036
 
-  '@trpc/next@11.0.0-rc.520':
-    resolution: {integrity: sha512-Q9Kf7Fp2VtjtMEeqOVAN6pE2biNmBfAMAhftSdz3Nw+ADBFtULosb6r4jgioAKBcuyNNq3PqF2rOzFvT9Sog0w==}
+  '@trpc/next@11.0.0-rc.522':
+    resolution: {integrity: sha512-IsTt6vCBDs4IJx1hzKgPrfnMmaTjCZJngc6n/EIjyl2FFn5ZWFERQGTtVlFKbsB6w63UTrtZaKRqJb4vNHWtMw==}
     peerDependencies:
       '@tanstack/react-query': ^5.54.1
-      '@trpc/client': 11.0.0-rc.520+de3ae0ae1
-      '@trpc/react-query': 11.0.0-rc.520+de3ae0ae1
-      '@trpc/server': 11.0.0-rc.520+de3ae0ae1
+      '@trpc/client': 11.0.0-rc.522+b99c8b036
+      '@trpc/react-query': 11.0.0-rc.522+b99c8b036
+      '@trpc/server': 11.0.0-rc.522+b99c8b036
       next: '*'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -880,17 +886,17 @@ packages:
       '@trpc/react-query':
         optional: true
 
-  '@trpc/react-query@11.0.0-rc.520':
-    resolution: {integrity: sha512-/z2MU5NQKwV9EdRBGvdnrEZWB1AAJRCOiZN7LfLiK9kSFwypcQX04b/rqeZbhWT9jfex6rmynul8pKEb5+JzEA==}
+  '@trpc/react-query@11.0.0-rc.522':
+    resolution: {integrity: sha512-cmt4B8UzRNEiY4T1eM8dLZ8YsSJpnT/bMk5xygcW3iD55Yclazadab/WUSwjrwgRdqqYepMnFo1CiZ5XpxBNuQ==}
     peerDependencies:
       '@tanstack/react-query': ^5.54.1
-      '@trpc/client': 11.0.0-rc.520+de3ae0ae1
-      '@trpc/server': 11.0.0-rc.520+de3ae0ae1
+      '@trpc/client': 11.0.0-rc.522+b99c8b036
+      '@trpc/server': 11.0.0-rc.522+b99c8b036
       react: '>=18.2.0'
       react-dom: '>=18.2.0'
 
-  '@trpc/server@11.0.0-rc.520':
-    resolution: {integrity: sha512-4X5cxq9+qH0EzoA4DKUvnaHC25TSvUfeJNG1lLQqa4jZwfstUE5CyzdxsUuwQeQGkDYvKr2yub2sbK3nNY+8oQ==}
+  '@trpc/server@11.0.0-rc.522':
+    resolution: {integrity: sha512-a0Cei94zJM/cYFBdsPEd1QPHhSsJljz7d2NI4n2jDow9xclZfEEp71hhth+i8vrddPjadexn++tzXcdEkeMbgg==}
 
   '@types/better-sqlite3@7.6.9':
     resolution: {integrity: sha512-FvktcujPDj9XKMJQWFcl2vVl7OdRIqsSRX9b0acWwTmwLK9CF2eqo/FRcmMLNpugKoX/avA6pb7TorDLmpgTnQ==}
@@ -1041,6 +1047,13 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
 
+  autoprefixer@10.4.20:
+    resolution: {integrity: sha512-XY25y5xSv/wEoqzDyXXME4AFfkZI0P23z6Fs3YgymDnKJkCGOnkL0iTxCa85UTqaSgfcqyf3UA6+c7wUvx/16g==}
+    engines: {node: ^10 || ^12 || >=14}
+    hasBin: true
+    peerDependencies:
+      postcss: ^8.1.0
+
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
@@ -1057,6 +1070,11 @@ packages:
   braces@3.0.2:
     resolution: {integrity: sha512-b8um+L1RzM3WDSzvhm6gIz1yfTbBt6YTlcEKAvsmqCZZFw46z626lVj9j1yEPW33H5H+lBQpZMP1k8l+78Ha0A==}
     engines: {node: '>=8'}
+
+  browserslist@4.23.3:
+    resolution: {integrity: sha512-btwCFJVjI4YWDNfau8RhZ+B1Q/VLoUITrm3RlP6y1tYGWIOa+InuYiRGXUBXo8nA1qKmHMyLB/iVQg5TT4eFoA==}
+    engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+    hasBin: true
 
   buffer-equal-constant-time@1.0.1:
     resolution: {integrity: sha512-zRpUiDwd/xk6ADqPMATG8vc9VPrkck7T07OIx0gnjmJAnHnTVXNQG3vfvWNuiZIkwu9KrKdA1iJKfsfTVxE6NA==}
@@ -1078,6 +1096,9 @@ packages:
 
   caniuse-lite@1.0.30001593:
     resolution: {integrity: sha512-UWM1zlo3cZfkpBysd7AS+z+v007q9G1+fLTUU42rQnY6t2axoogPW/xol6T7juU5EUoOhML4WgBIdG+9yYqAjQ==}
+
+  caniuse-lite@1.0.30001662:
+    resolution: {integrity: sha512-sgMUVwLmGseH8ZIrm1d51UbrhqMCH3jvS7gF/M6byuHOnKyLOBL7W8yz5V02OHwgLGA36o/AFhWzzh4uc5aqTA==}
 
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
@@ -1281,6 +1302,9 @@ packages:
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
 
+  electron-to-chromium@1.5.26:
+    resolution: {integrity: sha512-Z+OMe9M/V6Ep9n/52+b7lkvYEps26z4Yz3vjWL1V61W0q+VLF1pOHhMY17sa4roz4AWmULSI8E6SAojZA5L0YQ==}
+
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
 
@@ -1301,6 +1325,10 @@ packages:
     resolution: {integrity: sha512-aARqgq8roFBj054KvQr5f1sFu0D65G+miZRCuJyJ0G13Zwx7vRar5Zhn2tkQNzIXcBrNVsv/8stehpj+GAjgbg==}
     engines: {node: '>=12'}
     hasBin: true
+
+  escalade@3.2.0:
+    resolution: {integrity: sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA==}
+    engines: {node: '>=6'}
 
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
@@ -1386,6 +1414,9 @@ packages:
     resolution: {integrity: sha512-buewHzMvYL29jdeQTVILecSaZKnt/RJWjoZCF5OW60Z67/GmSLBkOFM7qh1PI3zFNtJbaZL5eQu1vLfazOwj4g==}
     engines: {node: '>=12.20.0'}
 
+  fraction.js@4.3.7:
+    resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
@@ -1445,6 +1476,10 @@ packages:
   hono@4.2.3:
     resolution: {integrity: sha512-yZDnPOp/XzjIB7KUWaOxwLSywnhxMvAKth8hfKhWQiWXeZhBfC6GlFnEst/FOOgn7rSWjShhQPS89PLEuHxq3Q==}
     engines: {node: '>=16.0.0'}
+
+  i@0.3.7:
+    resolution: {integrity: sha512-FYz4wlXgkQwIPqhzC5TdNMLSE5+GS1IIDJZY/1ZiEPCT2S3COUVZeT5OW4BmW4r5LHLQuOosSwsvnroG9GR59Q==}
+    engines: {node: '>=0.4'}
 
   ignore@5.3.1:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
@@ -1683,8 +1718,15 @@ packages:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
+  node-releases@2.0.18:
+    resolution: {integrity: sha512-d9VeXT4SJ7ZeOqGX6R5EM022wpL+eWPooLI+5UpWn2jCT1aosUQEhQP214x33Wkwx3JQMvIm+tIoVOdodFS40g==}
+
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
+    engines: {node: '>=0.10.0'}
+
+  normalize-range@0.1.2:
+    resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
 
   oauth4webapi@2.10.4:
@@ -1753,6 +1795,9 @@ packages:
 
   picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
+
+  picocolors@1.1.0:
+    resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
 
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -2074,6 +2119,12 @@ packages:
 
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+
+  update-browserslist-db@1.1.0:
+    resolution: {integrity: sha512-EdRAaAyk2cUE1wOf2DkEhzxqOQvFOoRJFNS6NeyJ01Gp2beMRpBAINjM2iDXE3KCuKhwnvHIQCJm6ThL2Z+HzQ==}
+    hasBin: true
+    peerDependencies:
+      browserslist: '>= 4.21.0'
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
@@ -2627,30 +2678,30 @@ snapshots:
       '@tanstack/query-core': 5.29.0
       react: 18.2.0
 
-  '@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520)':
+  '@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522)':
     dependencies:
-      '@trpc/server': 11.0.0-rc.520
+      '@trpc/server': 11.0.0-rc.522
 
-  '@trpc/next@11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/react-query@11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/server@11.0.0-rc.520)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@trpc/server@11.0.0-rc.520)(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@trpc/next@11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/react-query@11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/server@11.0.0-rc.522)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(@trpc/server@11.0.0-rc.522)(next@14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@trpc/client': 11.0.0-rc.520(@trpc/server@11.0.0-rc.520)
-      '@trpc/server': 11.0.0-rc.520
+      '@trpc/client': 11.0.0-rc.522(@trpc/server@11.0.0-rc.522)
+      '@trpc/server': 11.0.0-rc.522
       next: 14.1.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
     optionalDependencies:
       '@tanstack/react-query': 5.29.0(react@18.2.0)
-      '@trpc/react-query': 11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/server@11.0.0-rc.520)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@trpc/react-query': 11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/server@11.0.0-rc.522)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
 
-  '@trpc/react-query@11.0.0-rc.520(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.520(@trpc/server@11.0.0-rc.520))(@trpc/server@11.0.0-rc.520)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+  '@trpc/react-query@11.0.0-rc.522(@tanstack/react-query@5.29.0(react@18.2.0))(@trpc/client@11.0.0-rc.522(@trpc/server@11.0.0-rc.522))(@trpc/server@11.0.0-rc.522)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@tanstack/react-query': 5.29.0(react@18.2.0)
-      '@trpc/client': 11.0.0-rc.520(@trpc/server@11.0.0-rc.520)
-      '@trpc/server': 11.0.0-rc.520
+      '@trpc/client': 11.0.0-rc.522(@trpc/server@11.0.0-rc.522)
+      '@trpc/server': 11.0.0-rc.522
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  '@trpc/server@11.0.0-rc.520': {}
+  '@trpc/server@11.0.0-rc.522': {}
 
   '@types/better-sqlite3@7.6.9':
     dependencies:
@@ -2821,6 +2872,16 @@ snapshots:
 
   array-union@2.1.0: {}
 
+  autoprefixer@10.4.20(postcss@8.4.38):
+    dependencies:
+      browserslist: 4.23.3
+      caniuse-lite: 1.0.30001662
+      fraction.js: 4.3.7
+      normalize-range: 0.1.2
+      picocolors: 1.1.0
+      postcss: 8.4.38
+      postcss-value-parser: 4.2.0
+
   balanced-match@1.0.2: {}
 
   binary-extensions@2.3.0: {}
@@ -2838,6 +2899,13 @@ snapshots:
     dependencies:
       fill-range: 7.0.1
 
+  browserslist@4.23.3:
+    dependencies:
+      caniuse-lite: 1.0.30001662
+      electron-to-chromium: 1.5.26
+      node-releases: 2.0.18
+      update-browserslist-db: 1.1.0(browserslist@4.23.3)
+
   buffer-equal-constant-time@1.0.1: {}
 
   buffer-from@1.1.2: {}
@@ -2851,6 +2919,8 @@ snapshots:
   camelcase-css@2.0.1: {}
 
   caniuse-lite@1.0.30001593: {}
+
+  caniuse-lite@1.0.30001662: {}
 
   chalk@4.1.2:
     dependencies:
@@ -2960,6 +3030,8 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
+  electron-to-chromium@1.5.26: {}
+
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
@@ -3021,6 +3093,8 @@ snapshots:
       '@esbuild/win32-arm64': 0.19.12
       '@esbuild/win32-ia32': 0.19.12
       '@esbuild/win32-x64': 0.19.12
+
+  escalade@3.2.0: {}
 
   escape-string-regexp@4.0.0: {}
 
@@ -3144,6 +3218,8 @@ snapshots:
     dependencies:
       fetch-blob: 3.2.0
 
+  fraction.js@4.3.7: {}
+
   fs.realpath@1.0.0: {}
 
   fsevents@2.3.3:
@@ -3206,6 +3282,8 @@ snapshots:
       function-bind: 1.1.2
 
   hono@4.2.3: {}
+
+  i@0.3.7: {}
 
   ignore@5.3.1: {}
 
@@ -3440,7 +3518,11 @@ snapshots:
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
 
+  node-releases@2.0.18: {}
+
   normalize-path@3.0.0: {}
+
+  normalize-range@0.1.2: {}
 
   oauth4webapi@2.10.4: {}
 
@@ -3500,6 +3582,8 @@ snapshots:
   path-type@4.0.0: {}
 
   picocolors@1.0.0: {}
+
+  picocolors@1.1.0: {}
 
   picomatch@2.3.1: {}
 
@@ -3794,6 +3878,12 @@ snapshots:
   typescript@5.4.4: {}
 
   undici-types@5.26.5: {}
+
+  update-browserslist-db@1.1.0(browserslist@4.23.3):
+    dependencies:
+      browserslist: 4.23.3
+      escalade: 3.2.0
+      picocolors: 1.1.0
 
   uri-js@4.4.1:
     dependencies:

@@ -4,7 +4,7 @@ import { int, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core"
 
 const createTable = sqliteTableCreator((name) => `maintrack_${name}`)
 
-function uuid(name:string){
+function uuid(name:string) {
     return text(name, { length: 36 });
 }
 

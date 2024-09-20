@@ -1,12 +1,13 @@
+import { SignUpButton } from '@clerk/nextjs';
 import React from 'react';
 
-export default function Equipos() {
+export default function SignUp() {
     return <div style={{
         'width': '100%',
         'height': '100%',
         'alignItems': 'center',
         'justifyContent': 'center'
     }}>
-        <p>Test 123</p>
+        <SignUpButton />
     </div>;
 }
