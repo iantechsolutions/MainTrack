@@ -3,16 +3,20 @@ import { Hono } from 'hono';
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { HTTPException } from 'hono/http-exception';
 import { env } from '~/env';
-import { createClerkClient } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { api } from '~/trpc/server';
 import { UserRolesEnum } from '~/server/utils/roles';
+import { sign } from 'crypto';
+import {  CookieJar } from 'tough-cookie'
 
 // export const runtime = 'edge';
 const app = new Hono().basePath('/api/app/v1');
 
 const clerkClient = createClerkClient({ secretKey: env.CLERK_SECRET_KEY });
+
+
 
 app.use('*', clerkMiddleware());
 app.get('/test', async (c) => {
@@ -41,7 +45,10 @@ app.post('/signup', zValidator('json', schemaSignup), async (c) => {
     if (auth?.userId) {
         throw new HTTPException(400, { message: 'Already logged in' });
     }
-
+    // const response = await clerkClient.redirectUrls.createRedirectUrl({
+    //     url: "http://localhost:3000",
+    // })
+    // console.log(response);
     const data = c.req.valid('json');
     const user = await clerkClient.users.createUser({
         firstName: data.firstName,
@@ -49,17 +56,86 @@ app.post('/signup', zValidator('json', schemaSignup), async (c) => {
         emailAddress: [data.emailAddress],
         password: data.password,
     });
+    const signInToken = await clerkClient.signInTokens.createSignInToken({
+        userId: user.id,
+        expiresInSeconds: 60 * 60 * 24 * 30,
+    });
+
+    // const res = await fetch(signInToken.url, {
+    //     method: 'GET',
+    //     credentials: 'include',
+    // })
+
+    const res = await fetch(signInToken.url);
+    console.log(res);
+    
+    // Extract cookies from the response headers
+    const cookies = res.headers.get('set-cookie');
+    console.log("__session");
+    console.log(cookies);
+    console.log(signInToken.url);
+    
+    const jwtRes = await fetch("https://musical-wildcat-77.clerk.accounts.dev/v1/dev_browser?_clerk_js_version=5.22.3", {
+        method: 'POST',
+        credentials: 'include',
+        // headers: {
+        //     'Cookie': cookies // Include cookies in the request
+        // }
+    });
+    const json = await jwtRes.json();
+    console.log("jwtRes");
+    console.log(json);
+    
+    const resres = await fetch(`https://musical-wildcat-77.clerk.accounts.dev/v1/environment?_clerk_js_version=5.22.3&__clerk_db_jwt=${json.id}`, {
+        method: 'GET',
+    });
+    // const coso = await verifyToken(json.id, {authorizedParties: ["musical-wildcat-77.clerk.accounts.dev", "localhost:3000"]});
+    console.log("resres");
+    console.log(resres);
+    // console.log(res.headers.get('set-cookie'));
+    const sessions = await clerkClient.sessions.getSessionList({
+        userId: user.id
+    });
+    
+
 
     // ojo, signInToken no es lo mismo que session token
     // ejemplo: https://clerk.com/docs/custom-flows/embedded-email-links
     return c.json({
-        signInToken: await clerkClient.signInTokens.createSignInToken({
-            userId: user.id,
-            expiresInSeconds: 60 * 60 * 24 * 30,
-        }),
+        data: sessions.data,
         id: user.id
     });
 });
+
+
+app.get("/sessionById/:id", async (c) => {
+    const session = await clerkClient.sessions.getSession(c.req.param('id'));
+    return c.json(session);
+})
+
+app.get("/session", async (c) => {
+    const sessions = await clerkClient.sessions.getSessionList({
+        userId: "user_2mLGrtZvC1jJKFyASpWeAwm2Un4"
+    });
+    sessions.data.forEach(session => {
+        console.log(session.id, session.userId);
+    });
+    return c.json(sessions);
+})
+
+
+app.get("/userSessions/:id", async (c) => {
+    const sessions = await clerkClient.sessions.getSessionList({
+        userId: c.req.param('id')
+    });
+    return c.json(sessions);
+})
+
+
+app.get("/userId", async (c) => {
+    const user = await clerkClient.users.getUserList();
+    return c.json(user);
+})
 
 const schemaSignin = z.object({
     emailAddress: z.string(),
