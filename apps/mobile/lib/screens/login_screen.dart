@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
-import 'package:main_track/constants.dart';
+import 'package:maintrack/constants.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shadcn_ui/shadcn_ui.dart'; // Ensure this package is correctly imported
 // ignore: depend_on_referenced_packages

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:main_track/bloc/usuario_bloc.dart';
-import 'package:main_track/screens/login_screen.dart';
+import 'package:maintrack/bloc/usuario_bloc.dart';
+import 'package:maintrack/screens/login_screen.dart';
 import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() {

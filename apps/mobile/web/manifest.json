@@ -1,6 +1,6 @@
 {
-    "name": "mplikelanding",
-    "short_name": "mplikelanding",
+    "name": "MainTrack",
+    "short_name": "MainTrack",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
