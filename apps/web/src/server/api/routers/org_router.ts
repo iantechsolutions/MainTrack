@@ -7,7 +7,6 @@ import { getUserPublic } from "~/server/utils/other";
 import { UserRoles, UserRolesEnum } from "~/server/utils/roles";
 import jwt from 'jsonwebtoken';
 import { env } from "~/env";
-import { getUser, getUserByEmail } from "~/server/utils/user";
 
 export const orgRouter = createTRPCRouter({
     create: protectedProcedure
@@ -18,11 +17,13 @@ export const orgRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
 
-            let selfUserB = await getUser(selfId);
-            if (!selfUserB) {
+            let selfUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
+
+            if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
-            let selfUser = selfUserB.user;
 
             let orgs = await db.insert(schema.organizaciones)
                 .values({
@@ -58,7 +59,7 @@ export const orgRouter = createTRPCRouter({
             if (input.seleccionar) {
                 await db.update(schema.users)
                     .set({
-                        orgSeleccionada: org.Id,
+                        orgSel: org.Id,
                     })
                     .where(eq(schema.users.Id, selfUser.Id));
             }
@@ -74,7 +75,9 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -115,7 +118,9 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -155,12 +160,12 @@ export const orgRouter = createTRPCRouter({
                 .where(eq(schema.usuariosOrganizaciones.orgId, org.Id));
 
             // esto no necesita recorrer la tabla entera
-            // cosa que un update para todos los orgSeleccionada === org.Id sí haría
+            // cosa que un update para todos los orgSel === org.Id sí haría
             for (let orgUser of orgUserEntries) {
-                if (orgUser.user.orgSeleccionada === org.Id) {
+                if (orgUser.user.orgSel === org.Id) {
                     await db.update(schema.users)
                         .set({
-                            orgSeleccionada: null
+                            orgSel: null
                         })
                         .where(eq(schema.users.Id, orgUser.userId));
                 }
@@ -180,7 +185,9 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -209,7 +216,9 @@ export const orgRouter = createTRPCRouter({
     list: protectedProcedure
         .query(async ({ ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -237,7 +246,9 @@ export const orgRouter = createTRPCRouter({
         }))
         .query(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -262,7 +273,9 @@ export const orgRouter = createTRPCRouter({
             let usersDetailed = [];
             for (let user of orgUsers) {
                 usersDetailed.push({
-                    profile: await getUser(user.userId),
+                    profile: await db.query.users.findFirst({
+                        where: eq(schema.users.Id, user.userId)
+                    }),
                     orgUser: user
                 });
             }
@@ -282,21 +295,25 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
-            if (!selfUserB) {
+
+            let selfUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
+            if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
-            let selfUser = selfUserB.user;
 
             let userId;
             if (input.userEmail) {
-                const user = await getUserByEmail(input.userEmail);
+                const user = await db.query.users.findFirst({
+                    where: eq(schema.users.email, input.userEmail)
+                });
 
                 if (!user) {
                     throw new TRPCError({ code: "BAD_REQUEST" });
                 }
 
-                userId = user.user.Id;
+                userId = user.Id;
             } else if (input.userId) {
                 userId = input.userId;
             } else {
@@ -365,7 +382,9 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
+            let selfUserB = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -444,12 +463,12 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
-            if (!selfUserB) {
+            let selfUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
+            if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
-
-            let selfUser = selfUserB.user;
 
             /* if (selfId === input.userId) {
                 throw new TRPCError({ code: "BAD_REQUEST" });
@@ -521,9 +540,9 @@ export const orgRouter = createTRPCRouter({
                     eq(schema.usuariosOrganizaciones.userId, otherUser.Id)
                 ));
 
-            if (otherUser.orgSeleccionada === org.Id) {
+            if (otherUser.orgSel === org.Id) {
                 await db.update(schema.users).set({
-                    orgSeleccionada: null
+                    orgSel: null
                 }).where(eq(schema.users.Id, otherUser.Id));
             }
 
@@ -539,12 +558,12 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await getUser(selfId);
-            if (!selfUserB) {
+            let selfUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
+            if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
-
-            let selfUser = selfUserB.user;
 
             /* if (selfId === input.userId) {
                 throw new TRPCError({ code: "BAD_REQUEST" });
@@ -614,8 +633,10 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await getUser(selfId);
-            if (!selfUserB) {
+            let selfUser = await db.query.users.findFirst({
+                where: eq(schema.users.Id, selfId)
+            });
+            if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
@@ -630,7 +651,7 @@ export const orgRouter = createTRPCRouter({
             let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, org.Id),
-                    eq(schema.usuariosOrganizaciones.userId, selfUserB.user.Id)
+                    eq(schema.usuariosOrganizaciones.userId, selfUser.Id)
                 )
             });
 
@@ -640,9 +661,9 @@ export const orgRouter = createTRPCRouter({
 
             await db.update(schema.users)
                 .set({
-                    orgSeleccionada: org.Id
+                    orgSel: org.Id
                 })
-                .where(eq(schema.users.Id, selfUserB.user.Id));
+                .where(eq(schema.users.Id, selfUser.Id));
 
             return "ok";
         }),

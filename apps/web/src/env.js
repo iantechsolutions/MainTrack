@@ -12,11 +12,12 @@ export const env = createEnv({
             .url()
             .refine((str) => !str.includes('DATABASE_URL_EXAMPLE'), 'You forgot to change the default URL'), 
         NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-        // GOOGLE_CLIENT_ID: z.string(),
-        // GOOGLE_CLIENT_SECRET: z.string(),
-        CLERK_SECRET_KEY: z.string(),
+        NEXTAUTH_SECRET: z.string().refine((str) => str !== 'example'),
         JWT_INVITE_KEY: z.string().refine((str) => str !== 'example'),
         DATABASE_AUTH_TOKEN: z.string().refine((str) => str !== 'example'),
+        GOOGLE_CLIENT_ID: z.string().refine((str) => str !== 'example'),
+        GOOGLE_CLIENT_SECRET: z.string().refine((str) => str !== 'example'),
+        NEXTAUTH_URL: z.string().refine((str) => str !== 'https://example.com'),
     },
 
     /**
@@ -25,7 +26,6 @@ export const env = createEnv({
      * `NEXT_PUBLIC_`.
      */
     client: {
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
         NEXT_PUBLIC_TEST: z.string(),
     },
 
@@ -36,13 +36,13 @@ export const env = createEnv({
     runtimeEnv: {
         DATABASE_URL: process.env.DATABASE_URL,
         NODE_ENV: process.env.NODE_ENV,
-        // GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-        // GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-        CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+        NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
         NEXT_PUBLIC_TEST: process.env.NEXT_PUBLIC_TEST,
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
         JWT_INVITE_KEY: process.env.JWT_INVITE_KEY,
-        DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN
+        DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
+        GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

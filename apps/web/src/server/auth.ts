@@ -1,21 +1,11 @@
-import { auth, currentUser } from '@clerk/nextjs/server'
+import { GetServerSidePropsContext } from "next";
+import { getServerSession } from "next-auth";
+import { nextAuthOptions } from "~/app/api/auth/[...nextauth]/route";
 
-// https://clerk.com/docs/organizations/verify-user-permissions
-export const getServerAuthSession = () => {
-    const { userId, ...session } = auth()
-
-    if (!userId) {
-        return null
-    }
-
-    return {
-        ...session,
-        user: {
-            id: userId,
-        },
-    }
-}
-
-export const getServerAuthUser = () => {
-    return currentUser()
-}
+export const getServerAuthSession = (ctx: {
+    req: GetServerSidePropsContext["req"];
+    res: GetServerSidePropsContext["res"];
+}) => {
+    return getServerSession(ctx.req, ctx.res, nextAuthOptions);
+};
+  

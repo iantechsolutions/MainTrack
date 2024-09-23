@@ -3,14 +3,14 @@ import OrgEdit from "./edit";
 
 export default async function Page(props: { params: { orgId: string } }) {
     const user = await api.user.get();
-    if (!user.user.orgSeleccionada) {
+    if (!user.orgSel) {
         // esto nunca debería pasar
         return <h1>No hay org seleccionada</h1>;
     }
 
     const orgData = {
-        org: await api.org.get({orgId: user.user.orgSeleccionada}),
-        users: await api.org.listUsers({orgId: user.user.orgSeleccionada})
+        org: await api.org.get({orgId: user.orgSel}),
+        users: await api.org.listUsers({orgId: user.orgSel})
     };
 
     return <div style={{
@@ -25,7 +25,7 @@ export default async function Page(props: { params: { orgId: string } }) {
         <h3>Users:</h3>
         {orgData.users.map(u => <div key={`ou-${u?.profile.Id}`}>
             <p> Id: {u?.profile.Id}</p>
-            <p> Nombre: {u?.profile.nombre}</p>
+            <p> Nombre: {u?.profile.username}</p>
             {typeof u?.profile.imageUrl === 'string' && u?.profile.imageUrl.length > 0 ? (
                 <img src={u.profile.imageUrl} width={32} height={32}></img>
             ) : <></>}

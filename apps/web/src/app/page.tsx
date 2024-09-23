@@ -1,5 +1,3 @@
-import { SignInButton, SignOutButton, UserButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
 import React from 'react';
 import { getBaseUrl } from '~/server/utils/other';
 
@@ -16,9 +14,9 @@ export default async function Home() {
   return (
     <div>
       {/* <a href="/dashboard">Dashboard {testHono}</a> */}
-      <SignInButton></SignInButton>
+      { /* <SignInButton></SignInButton>
       <SignOutButton></SignOutButton>
-      <UserButton></UserButton>
+      <UserButton></UserButton> */ }
     </div>
   );
 }

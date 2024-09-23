@@ -14,13 +14,17 @@ export const users = createTable(
         Id: text("id")
             .notNull()
             .primaryKey(),
-        orgSeleccionada: uuid("orgSeleccionada")
+        username: text("username").notNull(),
+        email: text("email").notNull().unique(),
+        hash: text("hash").notNull(),
+        imageUrl: text("imageUrl"),
+        orgSel: uuid("orgSel")
     },
 );
 
 export const usersRelations = relations(users, ({ one, many }) => ({
-    orgSeleccionada: one(organizaciones, {
-        fields: [users.orgSeleccionada],
+    orgSel: one(organizaciones, {
+        fields: [users.orgSel],
         references: [organizaciones.Id],
     }),
     usuariosOrganizaciones: many(usuariosOrganizaciones)

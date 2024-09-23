@@ -8,32 +8,22 @@
  */
 
 import { TRPCError, initTRPC } from "@trpc/server";
+import { getServerSession, Session } from "next-auth";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { fromZodError } from "zod-validation-error";
-import { getServerAuthSession } from "~/server/auth";
-import { db } from "~/server/db";
+import * as trpcNext from "@trpc/server/adapters/next";
+import { nextAuthOptions } from "~/app/api/auth/[...nextauth]/route";
 
-/**
- * 1. CONTEXT
- *
- * This section defines the "contexts" that are available in the backend API.
- *
- * These allow you to access things when processing a request, like the database, the session, etc.
- *
- * This helper generates the "internals" for a tRPC context. The API handler and RSC cl1ients each
- * wrap this and provides the required context.
- *
- * @see https://trpc.io/docs/server/context
- */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
-  const session = await getServerAuthSession();
+export const createContext = async (ctx: trpcNext.CreateNextContextOptions) => {
+  const { req, res } = ctx;
+  const session = await getServerSession(req, res, nextAuthOptions);
 
   return {
-    db,
+    req,
+    res,
     session,
-    ...opts,
   };
 };
 
@@ -44,7 +34,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-const t = initTRPC.context<typeof createTRPCContext>().create({
+const t = initTRPC.context<typeof createContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     let zodErrorMessage: string | null = null;
@@ -104,13 +94,16 @@ export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session?.user) {
+  const ctxCast = ctx as {session?: Session};
+
+  if (!ctxCast.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+
   return next({
     ctx: {
       // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctxCast.session, user: ctxCast.session.user },
     },
   });
 });

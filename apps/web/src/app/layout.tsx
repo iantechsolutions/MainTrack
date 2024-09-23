@@ -1,8 +1,9 @@
 import { TRPCReactProvider } from "~/trpc/react"
-import { ClerkProvider, UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { SessionProvider } from "next-auth/react"
 import OrgSel from "~/components/orgsel";
 import { api } from "~/trpc/server";
+import { getServerSession } from "next-auth";
+import SessionBody from "./session";
 
 export const metadata = {
   title: 'MainTrack',
@@ -15,17 +16,17 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  let clerkAuth = auth();
-  let isLoggedIn = typeof clerkAuth.userId === 'string';
+  let clerkAuth = await getServerSession();
+  let isLoggedIn = typeof clerkAuth?.user?.email === 'string';
   let userData = isLoggedIn ? {
     profile: await api.user.get(),
     orgs: await api.org.list(),
   } : null;
 
   return (
-    <ClerkProvider signInFallbackRedirectUrl={"/"}>
-      <html lang='es'>
-        <TRPCReactProvider>
+    <html lang='es'>
+      <TRPCReactProvider>
+        <body>
           <header style={{
             'left': 0,
             'top': 0,
@@ -54,8 +55,7 @@ export default async function RootLayout({
               </div>
               <div>
                 {userData !== null ? <>
-                  <OrgSel orgSel={userData.profile.user.orgSeleccionada} orgs={userData.orgs}/>
-                  <UserButton/>
+                  <OrgSel orgSel={userData.profile.orgSel} orgs={userData.orgs}/>
                 </> : <></>}
               </div>
             </div>
@@ -92,10 +92,12 @@ export default async function RootLayout({
             'width': '80%',
             'height': '100%'
           }}>
-            {children}
+            <SessionBody>
+              {children}
+            </SessionBody>
           </main>
-        </TRPCReactProvider>
-      </html>
-    </ClerkProvider>
+        </body>
+      </TRPCReactProvider>
+    </html>
   )
 }
