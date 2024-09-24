@@ -1,7 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
 import React from 'react';
 import { getBaseUrl } from '~/server/utils/other';
-import { api } from '~/trpc/server';
+import { getApi } from '~/trpc/server';
 
 import ProfEdit from './profedit';
 import OrgNew from './orgnew';
@@ -10,37 +9,35 @@ import OrgInv from './orginv';
 import OrgInvA from './orginva';
 import OrgSel from './orgsel';
 import Orgs from './orgs';
+import { getServerSession } from 'next-auth';
 
 export default async function Home() {
+    const api = await getApi();
     const testQuery = await api.test.test();
-    let useAuth = auth();
-    let token = await useAuth.getToken();
+    const auth = await getServerSession();
 
     const url = `${getBaseUrl()}/api/app/v1/p/test`;
     console.log(url);
-    console.log(token);
 
-    const testHono = await (await fetch(url, { headers: [['Authorization', `Bearer ${await useAuth.getToken()}`]] })).text();
+    // const testHono = await (await fetch(url, { headers: [['Authorization', `Bearer ${await auth.()}`]] })).text();
     const perfil = await api.user.get();
     const orgs = await api.org.list();
-    const orgData = typeof perfil.user.orgSeleccionada === 'string' ? {
-        org: await api.org.get({ orgId: perfil.user.orgSeleccionada }),
-        users: await api.org.listUsers({ orgId: perfil.user.orgSeleccionada })
+    const orgData = typeof perfil.orgSel === 'string' ? {
+        org: await api.org.get({ orgId: perfil.orgSel }),
+        users: await api.org.listUsers({ orgId: perfil.orgSel })
     } : null;
 
     return (
         <div>
             <p>tRPC Test {testQuery}</p>
-            <p>Hono Test {testHono}</p>
             <div>
                 <h1>
                     Perfil
                 </h1>
-                <p>Id: {perfil.user.Id}</p>
-                <p>Org Seleccionada: {perfil.user.orgSeleccionada}</p>
-                <p>Email: {perfil.clerkUser.emailAddresses[0]?.emailAddress}</p>
-                <p>First Name: {perfil.clerkUser.firstName}</p>
-                <p>Last Name: {perfil.clerkUser.lastName}</p>
+                <p>Id: {perfil.Id}</p>
+                <p>Org Seleccionada: {perfil.orgSel}</p>
+                <p>Email: {perfil.email}</p>
+                <p>Name: {perfil.username}</p>
             </div>
             <div>
                 <h1>
@@ -52,7 +49,7 @@ export default async function Home() {
                 <h1>
                     Mis Organizaciones
                 </h1>
-                <Orgs orgs={orgs} selfId={perfil.user.Id}></Orgs>
+                <Orgs orgs={orgs} selfId={perfil.Id}></Orgs>
             </div>
             <div>
                 <h1>
@@ -65,7 +62,7 @@ export default async function Home() {
                     <h3>Users:</h3>
                     {orgData.users.map(u => <div key={`ou-${u?.profile.Id}`}>
                         <p> Id: {u?.profile.Id}</p>
-                        <p> Nombre: {u?.profile.nombre}</p>
+                        <p> Nombre: {u?.profile.username}</p>
                         <p> imageUrl: {u?.profile.imageUrl}</p>
                         {typeof u?.profile.imageUrl === 'string' && u?.profile.imageUrl.length > 0 ? (
                             <img src={u.profile.imageUrl} width={32} height={32}></img>
@@ -78,7 +75,7 @@ export default async function Home() {
                 <h1>
                     Selector Org
                 </h1>
-                {orgs.length > 0 ? <OrgSel orgs={orgs} orgSel={perfil.user.orgSeleccionada}></OrgSel> : <h6>No hay orgs disponibles para seleccionar</h6>}
+                {orgs.length > 0 ? <OrgSel orgs={orgs} orgSel={perfil.orgSel}></OrgSel> : <h6>No hay orgs disponibles para seleccionar</h6>}
             </div>
             <div>
                 <h1>

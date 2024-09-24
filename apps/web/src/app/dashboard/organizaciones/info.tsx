@@ -12,7 +12,7 @@ export default function OrgsInfo({orgs, selfId}: {
             orgId: string;
             user: {
                 Id: string;
-                orgSeleccionada: string | null;
+                orgSel: string | null;
             };
         }[];
     }[]

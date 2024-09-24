@@ -13,19 +13,7 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { fromZodError } from "zod-validation-error";
-import * as trpcNext from "@trpc/server/adapters/next";
-import { nextAuthOptions } from "~/app/api/auth/[...nextauth]/route";
-
-export const createContext = async (ctx: trpcNext.CreateNextContextOptions) => {
-  const { req, res } = ctx;
-  const session = await getServerSession(req, res, nextAuthOptions);
-
-  return {
-    req,
-    res,
-    session,
-  };
-};
+import { createContext } from "~/app/api/trpc/[trpc]/route";
 
 /**
  * 2. INITIALIZATION

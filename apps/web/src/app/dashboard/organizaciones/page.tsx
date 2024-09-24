@@ -1,12 +1,13 @@
 import React from 'react';
 import OrgsInfo from './info';
-import { api } from '~/trpc/server';
-import { auth } from '@clerk/nextjs/server';
+import { getApi } from '~/trpc/server';
 import OrgNew from './new';
+import { getServerSession } from 'next-auth';
 
 export default async function Organizaciones() {
+    const api = await getApi();
     let orgs = await api.org.list();
-    let selfId = auth().userId;
+    let selfId = (await getServerSession())?.user.id;
 
     return <div style={{
         'width': '100%',

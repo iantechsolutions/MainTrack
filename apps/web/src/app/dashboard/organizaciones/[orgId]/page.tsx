@@ -1,7 +1,8 @@
-import { api } from "~/trpc/server";
+import { getApi } from "~/trpc/server";
 import OrgEdit from "./edit";
 
 export default async function Page(props: { params: { orgId: string } }) {
+    const api = await getApi();
     const user = await api.user.get();
     if (!user.orgSel) {
         // esto nunca debería pasar

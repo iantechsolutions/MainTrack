@@ -1,22 +1,21 @@
 import 'server-only'
 
 import { headers } from 'next/headers'
-import { cache } from 'react'
-
 import { createCaller } from '~/server/api/root'
-import { createTRPCContext } from '~/server/api/trpc'
+import { getServerSession } from 'next-auth'
+import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/route'
+import { db } from '~/server/db'
 
-/**
- * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
- * handling a tRPC call from a React Server Component.
- */
-const createContext = cache(() => {
-    const heads = new Headers(headers())
-    heads.set('x-trpc-source', 'rsc')
+export const serverClient = async () => {
+    const session = await getServerSession(nextAuthOptions);
+    const heads = new Headers(headers());
+    heads.set('x-trpc-source', 'rsc');
 
-    return createTRPCContext({
+    return createCaller({
+        db,
+        session,
         headers: heads,
-    })
-})
+    });
+};
 
-export const api = createCaller(createContext)
+export const getApi = async () => await serverClient();

@@ -4,7 +4,7 @@ import { HTTPException } from 'hono/http-exception';
 import { env } from '~/env';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
-import { api } from '~/trpc/server';
+import { getApi } from '~/trpc/server';
 import { UserRolesEnum } from '~/server/utils/roles';
 import { authLoginSchema, authSignupSchema } from '~/server/api/routers/auth';
 import { editSelfSchema } from '~/server/api/routers/user_router';
@@ -36,6 +36,7 @@ app.get('/p/test', async (c) => {
 });
 
 app.post('/signup', zValidator('json', authSignupSchema), async (c) => {
+    const api = await getApi();
     return c.json(api.auth.signUp(c.req.valid('json')));
 });
 
@@ -47,10 +48,12 @@ app.post('/login', zValidator('json', authLoginSchema), async (c) => {
 // users
 
 app.get('/p/user', async (c) => {
+    const api = await getApi();
     return c.json(await api.user.get());
 });
 
 app.post('/p/user', zValidator('json', editSelfSchema), async (c) => {
+    const api = await getApi();
     return c.json(await api.user.editSelf(c.req.valid('json')));
 });
 
@@ -61,6 +64,7 @@ const schemaOrgPut = z.object({
 });
 
 app.put('/p/org', zValidator('json', schemaOrgPut), async (c) => {
+    const api = await getApi();
     return c.json(await api.org.create(c.req.valid('json')));
 });
 
@@ -70,6 +74,7 @@ const schemaOrgPatch = z.object({
 });
 
 app.patch('/p/org', zValidator('json', schemaOrgPatch), async (c) => {
+    const api = await getApi();
     return c.json(await api.org.edit(c.req.valid('json')));
 });
 
@@ -78,20 +83,24 @@ const schemaOrgDel = z.object({
 });
 
 app.delete('/p/org', zValidator('json', schemaOrgDel), async (c) => {
+    const api = await getApi();
     return c.json(await api.org.delete(c.req.valid('json')));
 });
 
 app.get('/p/org/:orgId', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.get({
         orgId: c.req.param('orgId')
     }));
 });
 
 app.get('/p/org/list', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.list());
 });
 
 app.get('/p/org/usuarios/:orgId', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.listUsers({
         orgId: c.req.param('orgId'),
     }));
@@ -104,16 +113,19 @@ const schemaOrgInvite = z.object({
 });
 
 app.post('/p/org/invite', zValidator('json', schemaOrgInvite), async (c) => {
+    const api = await getApi();
     return c.json(await api.org.inviteUser(c.req.valid('json')));
 });
 
 app.get('/p/org/join/:token', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.join({
         token: c.req.param('token')
     }));
 });
 
 app.get('/p/org/remove/:userId/:orgId', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.removeUser({
         userId: c.req.param('userId'),
         orgId: c.req.param('orgId')
@@ -127,10 +139,12 @@ const schemaOrgSetRole = z.object({
 });
 
 app.post('/p/org/setrole', zValidator('json', schemaOrgSetRole), async (c) => {
+    const api = await getApi();
     return c.json(await api.org.setRole(c.req.valid('json')));
 });
 
 app.get('/p/org/select/:orgId', async (c) => {
+    const api = await getApi();
     return c.json(await api.org.select({
         orgId: c.req.param('orgId')
     }));

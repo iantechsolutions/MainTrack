@@ -1,15 +1,15 @@
 import React from 'react';
-import { api } from '~/trpc/server';
-import { auth } from '@clerk/nextjs/server';
+import { getApi } from '~/trpc/server';
 import UserList from './list';
 
 export default async function Usuarios() {
+    const api = await getApi();
     let profile = await api.user.get();
-    if (!profile.user.orgSeleccionada) {
+    if (!profile.orgSel) {
         return <h1>Org no seleccionada</h1>;
     }
 
-    let users = await api.org.listUsers({orgId: profile.user.orgSeleccionada});
+    let users = await api.org.listUsers({orgId: profile.orgSel});
 
     return <div style={{
         'width': '100%',
