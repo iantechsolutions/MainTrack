@@ -52,4 +52,28 @@ export const authRouter = createTRPCRouter({
 
             return getUserSelf(user[0]);
         }),
+    logIn: publicProcedure
+        .input(authLoginSchema)    
+        .mutation(async ({ input, ctx }) => {
+            const {email, password } = input;
+
+            const dbUser = await db.query.users.findFirst({
+                where: eq(schema.users.email, email),
+            });
+
+            if (dbUser) {
+                const validPass = await verify(dbUser.hash, password);
+                if (validPass) {
+                    return getUserSelf(dbUser);
+                }
+                else {
+                    throw new TRPCError({
+                        code: "INTERNAL_SERVER_ERROR",
+                    });
+                }
+            }
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+            });
+        }),
 });

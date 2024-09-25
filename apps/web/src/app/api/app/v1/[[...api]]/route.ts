@@ -40,10 +40,11 @@ app.post('/signup', zValidator('json', authSignupSchema), async (c) => {
     return c.json(api.auth.signUp(c.req.valid('json')));
 });
 
-/* Usar endpoints de nextauth
+// Usar endpoints de nextauth
 app.post('/login', zValidator('json', authLoginSchema), async (c) => {
+    const api = await getApi();
     return c.json(api.auth.logIn(c.req.valid('json')));
-}); */
+}); 
 
 // users
 
