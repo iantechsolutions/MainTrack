@@ -19,7 +19,7 @@ export default function TipoEquipoNew({ orgId }: { orgId: string }) {
                 }
                 const res = await mut.mutateAsync({
                     name: refName.current.value,
-                    description: refName.current.value,
+                    description: refDesc.current.value,
                     orgId,
                 });
                 console.log(res);

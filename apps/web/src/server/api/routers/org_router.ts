@@ -137,16 +137,31 @@ export const orgRouter = createTRPCRouter({
             let selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
+
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
             let org = await db.query.organizaciones.findFirst({
+                with: {
+                    usuariosOrganizaciones: true,
+                },
                 where: eq(schema.organizaciones.Id, orgId)
             });
 
             if (!org) {
                 throw new TRPCError({ code: "NOT_FOUND" });
+            }
+
+            let adminCount = 0;
+            for (let usuarioRol of org.usuariosOrganizaciones.map(v => v.rol)) {
+                if (usuarioRol === UserRoles.orgAdmin) {
+                    adminCount++;
+                }
+            }
+
+            if (adminCount > 1) {
+                throw new TRPCError({ code: 'CONFLICT', message: 'Many admins left' });
             }
 
             let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
@@ -188,8 +203,26 @@ export const orgRouter = createTRPCRouter({
             }
 
             // borra la org
-            await db.delete(schema.organizaciones)
-                .where(eq(schema.organizaciones.Id, org.Id));
+            await db.transaction(async (tx) => {
+                await tx.delete(schema.usuariosOrganizaciones)
+                    .where(eq(schema.usuariosOrganizaciones.orgId, org.Id));
+                await tx.delete(schema.equipmentCategories)
+                    .where(eq(schema.equipmentCategories.orgId, org.Id));
+                await tx.delete(schema.equipmentPhotos)
+                    .where(eq(schema.equipmentPhotos.orgId, org.Id));
+                await tx.delete(schema.equipment)
+                    .where(eq(schema.equipment.orgId, org.Id));
+                await tx.delete(schema.documentTypes)
+                    .where(eq(schema.documentTypes.orgId, org.Id));
+                await tx.delete(schema.documents)
+                    .where(eq(schema.documents.orgId, org.Id));
+                await tx.delete(schema.ots)
+                    .where(eq(schema.ots.orgId, org.Id));
+                await tx.delete(schema.interventions)
+                    .where(eq(schema.interventions.orgId, org.Id));
+                await tx.delete(schema.organizaciones)
+                    .where(eq(schema.organizaciones.Id, org.Id));
+            });
 
             return "ok";
         }),

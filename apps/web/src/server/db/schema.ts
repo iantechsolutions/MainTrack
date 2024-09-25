@@ -138,6 +138,9 @@ export const equipmentPhotos = createTable(
         photoUrl: text("photoUrl").notNull(),
         uploadedAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
         description: text("description").notNull(),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
     },
 );
 
@@ -219,7 +222,10 @@ export const ots = createTable(
         daysLimit: integer("daysLimit").notNull(),
         daysPeriod: integer("daysPeriod"),
         // solo si es template
-        tipoEquipoId: uuid("tipoEquipoId").references(() => equipmentCategories.Id)
+        tipoEquipoId: uuid("tipoEquipoId").references(() => equipmentCategories.Id),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
     },
 );
 
@@ -241,6 +247,9 @@ export const interventions = createTable(
         otId: uuid("otId").notNull().references(() => ots.Id),
         limitDate: int("limitDate", {mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
         status: text("status"),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id),
     },
 );
 
