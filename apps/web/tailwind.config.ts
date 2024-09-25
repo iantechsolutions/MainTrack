@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
- 
-const config: Config = {
+import { withUt } from "uploadthing/tw";
+
+const config: Config = withUt({
   content: [
     './src/app/**/*.{js,ts,jsx,tsx,mdx}', // Note the addition of the `app` directory.
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -13,5 +14,6 @@ const config: Config = {
     extend: {},
   },
   plugins: [],
-}
-export default config
+});
+
+export default config;

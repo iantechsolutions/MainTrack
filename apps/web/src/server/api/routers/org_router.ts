@@ -8,12 +8,31 @@ import { UserRoles, UserRolesEnum } from "~/server/utils/roles";
 import jwt from 'jsonwebtoken';
 import { env } from "~/env";
 
+export const schemaOrgSetRole = z.object({
+    userId: z.string(),
+    orgId: z.string(),
+    role: z.enum(UserRolesEnum)
+});
+
+export const schemaOrgInvite = z.object({
+    userId: z.string().optional(),
+    userEmail: z.string().optional(),
+    orgId: z.string(),
+});
+
+export const schemaOrgPatch = z.object({
+    name: z.string().min(1).max(1024),
+    orgId: z.string(),
+});
+
+export const schemaOrgPut = z.object({
+    name: z.string().min(1).max(1024),
+    seleccionar: z.boolean().default(false),
+});
+
 export const orgRouter = createTRPCRouter({
     create: protectedProcedure
-        .input(z.object({
-            name: z.string().min(1).max(1024),
-            seleccionar: z.boolean().default(false),
-        }))
+        .input(schemaOrgPut)
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
 
@@ -67,10 +86,7 @@ export const orgRouter = createTRPCRouter({
             return org;
         }),
     edit: protectedProcedure
-        .input(z.object({
-            orgId: z.string(),
-            name: z.string().min(1).max(1024)
-        }))
+        .input(schemaOrgPatch)
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
             const { orgId } = input;
@@ -286,13 +302,7 @@ export const orgRouter = createTRPCRouter({
             } : null);
         }),
     inviteUser: protectedProcedure
-        .input(
-            z.object({
-                userId: z.string().optional(),
-                userEmail: z.string().optional(),
-                orgId: z.string(),
-            })
-        )
+        .input(schemaOrgInvite)
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
 
@@ -466,6 +476,7 @@ export const orgRouter = createTRPCRouter({
             let selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
+
             if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
@@ -549,13 +560,7 @@ export const orgRouter = createTRPCRouter({
             return "ok";
         }),
     setRole: protectedProcedure
-        .input(
-            z.object({
-                userId: z.string(),
-                orgId: z.string(),
-                role: z.enum(UserRolesEnum)
-            })
-        )
+        .input(schemaOrgSetRole)
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
             let selfUser = await db.query.users.findFirst({

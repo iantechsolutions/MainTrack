@@ -9,6 +9,11 @@ import { UserRolesEnum } from '~/server/utils/roles';
 import { authLoginSchema, authSignupSchema } from '~/server/api/routers/auth';
 import { editSelfSchema } from '~/server/api/routers/user_router';
 import { getServerSession } from 'next-auth';
+import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/route';
+import { docCreateSchema, docListSchema } from '~/server/api/routers/doc_router';
+import { docTypeCreateSchema, docTypeListSchema } from '~/server/api/routers/doctype_router';
+import { schemaOrgInvite, schemaOrgPatch, schemaOrgPut, schemaOrgSetRole } from '~/server/api/routers/org_router';
+import { eqTypeCreateSchema, eqTypeListSchema } from '~/server/api/routers/eq_type_roouter';
 
 type HonoVariables = {
     uid: string
@@ -18,7 +23,7 @@ type HonoVariables = {
 const app = new Hono<{ Variables: HonoVariables }>().basePath('/api/app/v1');
 
 app.use('/p/*', async (c, next) => {
-    const session = await getServerSession();
+    const session = await getServerSession(nextAuthOptions);
     if (!session) {
         return c.status(400);
     } else {
@@ -59,19 +64,9 @@ app.post('/p/user', zValidator('json', editSelfSchema), async (c) => {
 });
 
 // orgs
-const schemaOrgPut = z.object({
-    name: z.string().min(1).max(1024),
-    seleccionar: z.boolean().default(false),
-});
-
 app.put('/p/org', zValidator('json', schemaOrgPut), async (c) => {
     const api = await getApi();
     return c.json(await api.org.create(c.req.valid('json')));
-});
-
-const schemaOrgPatch = z.object({
-    name: z.string().min(1).max(1024),
-    orgId: z.string(),
 });
 
 app.patch('/p/org', zValidator('json', schemaOrgPatch), async (c) => {
@@ -85,7 +80,7 @@ const schemaOrgDel = z.object({
 
 app.delete('/p/org', zValidator('json', schemaOrgDel), async (c) => {
     const api = await getApi();
-    return c.json(await api.org.delete(c.req.valid('json')));
+    return c.text(await api.org.delete(c.req.valid('json')));
 });
 
 app.get('/p/org/:orgId', async (c) => {
@@ -107,36 +102,24 @@ app.get('/p/org/usuarios/:orgId', async (c) => {
     }));
 });
 
-const schemaOrgInvite = z.object({
-    userId: z.string().optional(),
-    userEmail: z.string().optional(),
-    orgId: z.string(),
-});
-
 app.post('/p/org/invite', zValidator('json', schemaOrgInvite), async (c) => {
     const api = await getApi();
-    return c.json(await api.org.inviteUser(c.req.valid('json')));
+    return c.text(await api.org.inviteUser(c.req.valid('json')));
 });
 
 app.get('/p/org/join/:token', async (c) => {
     const api = await getApi();
-    return c.json(await api.org.join({
+    return c.text(await api.org.join({
         token: c.req.param('token')
     }));
 });
 
 app.get('/p/org/remove/:userId/:orgId', async (c) => {
     const api = await getApi();
-    return c.json(await api.org.removeUser({
+    return c.text(await api.org.removeUser({
         userId: c.req.param('userId'),
         orgId: c.req.param('orgId')
     }));
-});
-
-const schemaOrgSetRole = z.object({
-    userId: z.string(),
-    orgId: z.string(),
-    role: z.enum(UserRolesEnum)
 });
 
 app.post('/p/org/setrole', zValidator('json', schemaOrgSetRole), async (c) => {
@@ -146,9 +129,88 @@ app.post('/p/org/setrole', zValidator('json', schemaOrgSetRole), async (c) => {
 
 app.get('/p/org/select/:orgId', async (c) => {
     const api = await getApi();
-    return c.json(await api.org.select({
+    return c.text(await api.org.select({
         orgId: c.req.param('orgId')
     }));
+});
+
+app.put('/p/doc', zValidator('json', docCreateSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.doc.create(c.req.valid('json')));
+});
+
+app.delete('/p/doc/:docId', async (c) => {
+    const api = await getApi();
+    return c.text(await api.doc.delete({
+        id: c.req.param('docId')
+    }));
+});
+
+app.get('/p/doc/:docId', async (c) => {
+    const api = await getApi();
+    return c.json(await api.doc.get({
+        id: c.req.param('docId')
+    }));
+});
+
+// post porque los argumentos son un choclazo
+app.post('/p/doc/list', zValidator('json', docListSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.doc.listFiltered(c.req.valid('json')));
+});
+
+app.put('/p/doctype', zValidator('json', docTypeCreateSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.docType.create(c.req.valid('json')));
+});
+
+app.delete('/p/doctype/:docTypeId', async (c) => {
+    const api = await getApi();
+    return c.text(await api.docType.delete({
+        id: c.req.param('docTypeId')
+    }));
+});
+
+// lista de doctypes de orgId
+app.get('/p/doctype/:orgId', async (c) => {
+    const api = await getApi();
+    return c.json(await api.docType.list({
+        orgId: c.req.param('orgId')
+    }));
+});
+
+// lista filtrada
+// post porque los argumentos son un choclazo
+app.post('/p/doctype/list', zValidator('json', docTypeListSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.docType.listFiltered(c.req.valid('json')));
+});
+
+app.put('/p/eqtype', zValidator('json', eqTypeCreateSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.eqType.create(c.req.valid('json')));
+});
+
+app.delete('/p/eqtype/:eqTypeId', async (c) => {
+    const api = await getApi();
+    return c.text(await api.eqType.delete({
+        id: c.req.param('eqTypeId')
+    }));
+});
+
+// lista de eqtypes de orgId
+app.get('/p/eqtype/:orgId', async (c) => {
+    const api = await getApi();
+    return c.json(await api.eqType.list({
+        orgId: c.req.param('orgId')
+    }));
+});
+
+// lista filtrada
+// post porque los argumentos son un choclazo, para ponerlos en el body
+app.post('/p/eqtype/list', zValidator('json', eqTypeListSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.eqType.listFiltered(c.req.valid('json')));
 });
 
 export const GET = app.fetch

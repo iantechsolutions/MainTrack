@@ -18,6 +18,7 @@ export const env = createEnv({
         GOOGLE_CLIENT_ID: z.string().refine((str) => str !== 'example'),
         GOOGLE_CLIENT_SECRET: z.string().refine((str) => str !== 'example'),
         NEXTAUTH_URL: z.string().refine((str) => str !== 'https://example.com'),
+        UPLOADTHING_TOKEN: z.string().refine((str) => str !== 'example'),
     },
 
     /**
@@ -42,7 +43,8 @@ export const env = createEnv({
         DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
         GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
         GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-        NEXTAUTH_URL: process.env.NEXTAUTH_URL
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+        UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
     },
     /**
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

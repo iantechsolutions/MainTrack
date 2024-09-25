@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { relations, sql } from "drizzle-orm";
-import { int, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
+import { int, integer, real, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
 
 const createTable = sqliteTableCreator((name) => `maintrack_${name}`)
 
@@ -69,36 +69,141 @@ export const usuariosOrganizacionesRelations = relations(usuariosOrganizaciones,
     }),
 }));
 
-export const equipos = createTable(
-    "equipos",
+export const equipment = createTable(
+    "equipment",
     {
         Id: uuid("id")
             .notNull()
             .primaryKey()
             .$defaultFn(() => nanoid()),
-        nombre: text("nombre"),
-        codigo: text("codigo"),
-        tipoEquipoId: uuid("tipoEquipoId").references(() => tiposEquipos.Id)
+        name: text("name").notNull(),
+        model: text("model").notNull(),
+        manufacturer: text("manufacturer").notNull(),
+        serial: text("serial"),
+        purchaseDate: int("purchaseDate", {mode:"timestamp"}),
+        warrantyExpiration: int("warrantyExpiration", {mode:"timestamp"}),
+        status: text("status").notNull(),
+        locationLat: real("locationLon"),
+        locationLon: real("locationLat"),
+        createdAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        categoryId: uuid("categoryId").notNull().references(() => equipmentCategories.Id),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
     },
 );
 
-export const equiposRelations = relations(equipos, ({ one }) => ({
-    tipoEquipoId: one(tiposEquipos, {
-        fields: [equipos.tipoEquipoId],
-        references: [tiposEquipos.Id],
+export const equiposRelations = relations(equipment, ({ one }) => ({
+    categoryId: one(equipmentCategories, {
+        fields: [equipment.categoryId],
+        references: [equipmentCategories.Id],
+    }),
+    orgId: one(organizaciones, {
+        fields: [equipment.orgId],
+        references: [organizaciones.Id],
     }),
 }));
 
-export const tiposEquipos = createTable(
-    "tiposEquipos",
+export const equipmentCategories = createTable(
+    "equipmentCategories",
     {
         Id: uuid("id")
             .notNull()
             .primaryKey()
             .$defaultFn(() => nanoid()),
-        nombreCategoria: text("nombreCategoria").notNull(),
+        name: text("name").notNull(),
+        description: text("description").notNull(),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
     },
 );
+
+export const equipmentCategoriesRelations = relations(equipmentCategories, ({ one, many }) => ({
+    orgId: one(organizaciones, {
+        fields: [equipmentCategories.orgId],
+        references: [organizaciones.Id],
+    }),
+    ots: many(ots),
+}));
+
+export const equipmentPhotos = createTable(
+    "equipmentPhotos",
+    {
+        Id: uuid("id")
+            .notNull()
+            .primaryKey()
+            .$defaultFn(() => nanoid()),
+        equipmentId: uuid("equipmentId").notNull().references(() => equipment.Id),
+        photoUrl: text("photoUrl").notNull(),
+        uploadedAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        description: text("description").notNull(),
+    },
+);
+
+export const equipmentPhotosRelations = relations(equipmentPhotos, ({ one }) => ({
+    equipmentId: one(equipment, {
+        fields: [equipmentPhotos.equipmentId],
+        references: [equipment.Id],
+    }),
+}));
+
+export const documentTypes = createTable(
+    "documentTypes",
+    {
+        Id: uuid("id")
+            .notNull()
+            .primaryKey()
+            .$defaultFn(() => nanoid()),
+        typeName: text("typeName").notNull(),
+        description: text("description").notNull(),
+        correlatedWith: text("correlatedWith").notNull(),
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
+    },
+);
+
+export const documentTypesRelations = relations(documentTypes, ({ one }) => ({
+    orgId: one(organizaciones, {
+        fields: [documentTypes.orgId],
+        references: [organizaciones.Id],
+    }),
+}));
+
+export const documents = createTable(
+    "documents",
+    {
+        Id: uuid("id")
+            .notNull()
+            .primaryKey()
+            .$defaultFn(() => nanoid()),
+        docType: text("docType").notNull(),
+        docUrl: text("docUrl").notNull(),
+        uploadedAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        comment: text("comment"),
+        equipmentId: uuid("equipmentId"), // sin .references por la nulabilidad
+        equCategoryId: uuid("equCategoryId"), // sin .references por la nulabilidad
+        orgId: uuid("orgId")
+            .notNull()
+            .references(() => organizaciones.Id)
+    },
+);
+
+export const documentsRelations = relations(documents, ({ one }) => ({
+    equipmentId: one(equipment, {
+        fields: [documents.equipmentId],
+        references: [equipment.Id],
+    }),
+    equCategoryId: one(equipmentCategories, {
+        fields: [documents.equCategoryId],
+        references: [equipmentCategories.Id],
+    }),
+    orgId: one(organizaciones, {
+        fields: [documents.orgId],
+        references: [organizaciones.Id],
+    }),
+}));
 
 export const ots = createTable(
     "ots",
@@ -108,48 +213,44 @@ export const ots = createTable(
             .primaryKey()
             .$defaultFn(() => nanoid()),
         isTemplate: int("isTemplate",{mode: "boolean"}).default(false),
-        nombre: text("nombre").notNull(),
-        tipo: text("tipo").notNull(),
-        fecha: int("fecha",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
+        name: text("name").notNull(),
+        otType: text("otType").notNull(),
+        date: int("date",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
         daysLimit: integer("daysLimit").notNull(),
         daysPeriod: integer("daysPeriod"),
         // solo si es template
-        tipoEquipoId: uuid("tipoEquipoId").references(() => tiposEquipos.Id)
+        tipoEquipoId: uuid("tipoEquipoId").references(() => equipmentCategories.Id)
     },
 );
 
 export const otsRelations = relations(ots, ({ one }) => ({
-    tipoEquipoId: one(tiposEquipos, {
+    tipoEquipoId: one(equipmentCategories, {
         fields: [ots.tipoEquipoId],
-        references: [tiposEquipos.Id],
+        references: [equipmentCategories.Id],
     }),
 }));
 
-export const tipoEquiposRelations = relations(tiposEquipos, ({ many }) => ({
-    ots: many(ots),
-}));
-
-export const intervenciones = createTable(
-    "intervenciones",
+export const interventions = createTable(
+    "interventions",
     {
         Id: uuid("id")
             .notNull()
             .primaryKey()
             .$defaultFn(() => nanoid()),
-        idUsuario: uuid("idUsuario").notNull().references(() => users.Id),
-        idOT: uuid("idOT").notNull().references(() => ots.Id),
-        fechaLimite: int("fecha",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
+        userId: uuid("userId").notNull().references(() => users.Id),
+        otId: uuid("otId").notNull().references(() => ots.Id),
+        limitDate: int("limitDate", {mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
         status: text("status"),
     },
 );
 
-export const intervencionesRelations = relations(intervenciones, ({ one }) => ({
-    idOT: one(ots, {
-        fields: [intervenciones.idOT],
+export const intervencionesRelations = relations(interventions, ({ one }) => ({
+    otId: one(ots, {
+        fields: [interventions.otId],
         references: [ots.Id],
     }),
-    idUsuario: one(users, {
-        fields: [intervenciones.idUsuario],
+    userId: one(users, {
+        fields: [interventions.userId],
         references: [users.Id],
     }),
 }));
