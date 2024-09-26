@@ -46,7 +46,7 @@ export const nextAuthOptions: NextAuthOptions = {
         return {
           id: user.Id,
           email: user.email,
-          username: user.username,
+          name: user.Id, // uso el name para almacenar el id
           user,
         };
       },
@@ -55,10 +55,10 @@ export const nextAuthOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({token, user}) {
-        if (user?.id) {
-            token.id = user.id;
-        }
-        return token;
+      if (user?.id) {
+        token.id = user.id;
+      }
+      return token;
     },
     async session({session, token}) {
       session.user.id = token.id;

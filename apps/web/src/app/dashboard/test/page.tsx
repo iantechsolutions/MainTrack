@@ -9,12 +9,12 @@ import OrgInv from './orginv';
 import OrgInvA from './orginva';
 import OrgSel from './orgsel';
 import Orgs from './orgs';
-import { getServerSession } from 'next-auth';
+import { getAuthId } from '~/lib/utils';
 
 export default async function Home() {
     const api = await getApi();
     const testQuery = await api.test.test();
-    const auth = await getServerSession();
+    const auth = await getAuthId();
 
     const url = `${getBaseUrl()}/api/app/v1/p/test`;
     console.log(url);
