@@ -1,4 +1,6 @@
 'use client'
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
 
 import { useRef } from "react";
 import { api } from "~/trpc/react";
@@ -21,10 +23,10 @@ export default function OrgEdit() {
             console.log(res);
         })();
     }}>
-        <label>Id:</label><br></br>
-        <input ref={refId} type="text" id="id" name="id"></input><br></br>
-        <label>Nombre:</label><br></br>
-        <input ref={refName} type="text" id="name" name="name"></input><br></br>
+        <Label>Id:</Label><br></br>
+        <Input ref={refId} type="text" id="id" name="id"></Input><br></br>
+        <Label>Nombre:</Label><br></br>
+        <Input ref={refName} type="text" id="name" name="name"></Input><br></br>
         <button type="submit">Submit</button>
     </form>;
 }

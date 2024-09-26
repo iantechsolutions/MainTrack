@@ -2,6 +2,9 @@
 
 import { useRef } from "react";
 import { api } from "~/trpc/react";
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
+
 
 export default function OrgInvA() {
     const refToken = useRef<HTMLInputElement>(null);
@@ -19,8 +22,8 @@ export default function OrgInvA() {
             console.log(res);
         })();
     }}>
-        <label>Token:</label><br></br>
-        <input ref={refToken} type="text" id="id" name="id"></input><br></br>
+        <Label>Token:</Label><br></br>
+        <Input ref={refToken} type="text" id="id" name="id"></Input><br></br>
         <button type="submit">Submit</button>
     </form>;
 }

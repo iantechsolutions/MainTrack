@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { api } from "~/trpc/react";
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
 
 export default function OrgRole() {
     const refId = useRef<HTMLInputElement>(null);
@@ -23,12 +25,12 @@ export default function OrgRole() {
             console.log(res);
         })();
     }}>
-        <label>Org Id:</label><br></br>
-        <input ref={refId} type="text" id="id" name="id"></input><br></br>
-        <label>User Id:</label><br></br>
-        <input ref={refUserId} type="text" id="uid" name="iud"></input><br></br>
-        <label>Rol:</label><br></br>
-        <input ref={refRole} type="text" id="r" name="r"></input><br></br>
+        <Label>Org Id:</Label><br></br>
+        <Input ref={refId} type="text" id="id" name="id"></Input><br></br>
+        <Label>User Id:</Label><br></br>
+        <Input ref={refUserId} type="text" id="uid" name="iud"></Input><br></br>
+        <Label>Rol:</Label><br></br>
+        <Input ref={refRole} type="text" id="r" name="r"></Input><br></br>
         <button type="submit">Submit</button>
     </form>;
 }

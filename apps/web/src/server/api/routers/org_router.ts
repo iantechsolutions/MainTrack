@@ -27,7 +27,7 @@ export const schemaOrgPatch = z.object({
 
 export const schemaOrgPut = z.object({
     name: z.string().min(1).max(1024),
-    seleccionar: z.boolean().default(false),
+    // seleccionar: z.boolean().default(false),
 });
 
 export const orgRouter = createTRPCRouter({
@@ -49,7 +49,7 @@ export const orgRouter = createTRPCRouter({
                     nombre: input.name
                 })
                 .returning();
-            
+            console.log(orgs);
             if (orgs.length < 1) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
             }
@@ -75,13 +75,13 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
             }
 
-            if (input.seleccionar) {
+            // if (input.seleccionar) {
                 await db.update(schema.users)
                     .set({
                         orgSel: org.Id,
                     })
                     .where(eq(schema.users.Id, selfUser.Id));
-            }
+            // }
 
             return org;
         }),

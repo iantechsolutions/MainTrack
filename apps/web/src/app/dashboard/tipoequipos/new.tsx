@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { api } from "~/trpc/react";
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
 
 export default function TipoEquipoNew({ orgId }: { orgId: string }) {
     const refName = useRef<HTMLInputElement>(null);
@@ -25,10 +27,10 @@ export default function TipoEquipoNew({ orgId }: { orgId: string }) {
                 console.log(res);
             })();
         }}>
-            <label>Nombre:</label><br></br>
-            <input ref={refName} type="text" id="oname" name="oname"></input><br></br>
-            <label>Descripción:</label><br></br>
-            <input ref={refDesc} type="text" id="desc" name="desc"></input><br></br>
+            <Label>Nombre:</Label><br></br>
+            <Input ref={refName} type="text" id="oname" name="oname"></Input><br></br>
+            <Label>Descripción:</Label><br></br>
+            <Input ref={refDesc} type="text" id="desc" name="desc"></Input><br></br>
             <button type="submit">Submit</button>
         </form>
     </>;

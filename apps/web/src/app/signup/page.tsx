@@ -2,6 +2,8 @@
 import React, { useRef } from 'react';
 import { useSession, signIn } from "next-auth/react";
 import { api } from '~/trpc/react';
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
 
 export default function SignUp() {
     const { data: session } = useSession();
@@ -31,12 +33,12 @@ export default function SignUp() {
                     console.log(res);
                 })();
             }}>
-                <label>Nombre:</label><br></br>
-                <input ref={refName} type="text" id="name" name="name"></input><br></br>
-                <label>Email:</label><br></br>
-                <input ref={refEmail} type="text" id="email" name="email"></input><br></br>
-                <label>Contraseña:</label><br></br>
-                <input ref={refPassword} type="password" id="pswd" name="pswd"></input><br></br>
+                <Label>Nombre:</Label><br></br>
+                <Input ref={refName} type="text" id="name" name="name"></Input><br></br>
+                <Label>Email:</Label><br></br>
+                <Input ref={refEmail} type="text" id="email" name="email"></Input><br></br>
+                <Label>Contraseña:</Label><br></br>
+                <Input ref={refPassword} type="password" id="pswd" name="pswd"></Input><br></br>
                 <button type="submit">Submit</button>
             </form>
         </>}

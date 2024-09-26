@@ -2,6 +2,8 @@
 
 import { useRef } from "react";
 import { api } from "~/trpc/react";
+import { Input } from "~/components/ui/input";
+import { Label } from '~/components/ui/label';
 
 export default function OrgNew() {
     const refName = useRef<HTMLInputElement>(null);
@@ -17,14 +19,14 @@ export default function OrgNew() {
             }
             const res = await mut.mutateAsync({
                 name: refName.current.value,
-                seleccionar: refName.current.checked
+                // seleccionar: refName.current.checked
             });
             console.log(res);
         })();
     }}>
-        <label>Nombre:</label><br></br>
-        <input ref={refName} type="text" id="oname" name="oname"></input><br></br>
-        <label>Seleccionar:</label><br></br>
+        <Label>Nombre:</Label><br></br>
+        <Input ref={refName} type="text" id="oname" name="oname"></Input><br></br>
+        <Label>Seleccionar:</Label><br></br>
         <input ref={refSel} type="checkbox" id="sel" name="sel"></input><br></br>
         <button type="submit">Submit</button>
     </form>;
