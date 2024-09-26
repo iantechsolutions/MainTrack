@@ -15,9 +15,9 @@ export default function OrgSel({orgSel, orgs}: {
                 orgId: v.target.value
             });
             console.log(res);
+            window.location.reload();
         }}>
             {orgs.map(o => <option key={`opt-${o.Id}`} value={o.Id}>{o.nombre}</option>)}
         </select>
     </div>;
 }
-

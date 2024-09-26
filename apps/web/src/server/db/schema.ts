@@ -4,8 +4,12 @@ import { int, integer, real, sqliteTableCreator, text } from "drizzle-orm/sqlite
 
 const createTable = sqliteTableCreator((name) => `maintrack_${name}`)
 
-function uuid(name:string) {
+function uuid(name: string) {
     return text(name, { length: 36 });
+}
+
+function ts(name: string) {
+    return int(name, { mode: 'timestamp' })
 }
 
 export const users = createTable(
@@ -80,12 +84,12 @@ export const equipment = createTable(
         model: text("model").notNull(),
         manufacturer: text("manufacturer").notNull(),
         serial: text("serial"),
-        purchaseDate: int("purchaseDate", {mode:"timestamp"}),
-        warrantyExpiration: int("warrantyExpiration", {mode:"timestamp"}),
+        purchaseDate: ts("purchaseDate"),
+        warrantyExpiration: ts("warrantyExpiration"),
+        locationLat: real("locationLon").notNull(),
+        locationLon: real("locationLat").notNull(),
         status: text("status").notNull(),
-        locationLat: real("locationLon"),
-        locationLon: real("locationLat"),
-        createdAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        createdAt: ts("createdAt").notNull().default(sql`CURRENT_TIMESTAMP`),
         categoryId: uuid("categoryId").notNull().references(() => equipmentCategories.Id),
         orgId: uuid("orgId")
             .notNull()
@@ -136,7 +140,7 @@ export const equipmentPhotos = createTable(
             .$defaultFn(() => nanoid()),
         equipmentId: uuid("equipmentId").notNull().references(() => equipment.Id),
         photoUrl: text("photoUrl").notNull(),
-        uploadedAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        uploadedAt: ts("createdAt").notNull().default(sql`CURRENT_TIMESTAMP`),
         description: text("description").notNull(),
         orgId: uuid("orgId")
             .notNull()
@@ -183,7 +187,7 @@ export const documents = createTable(
             .$defaultFn(() => nanoid()),
         docType: text("docType").notNull(),
         docUrl: text("docUrl").notNull(),
-        uploadedAt: int("createdAt", {mode:"timestamp"}).notNull().default(sql`CURRENT_TIMESTAMP`),
+        uploadedAt: ts("createdAt").notNull().default(sql`CURRENT_TIMESTAMP`),
         comment: text("comment"),
         equipmentId: uuid("equipmentId"), // sin .references por la nulabilidad
         equCategoryId: uuid("equCategoryId"), // sin .references por la nulabilidad
@@ -218,7 +222,7 @@ export const ots = createTable(
         isTemplate: int("isTemplate",{mode: "boolean"}).default(false),
         name: text("name").notNull(),
         otType: text("otType").notNull(),
-        date: int("date",{mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
+        date: ts("date").default(sql`CURRENT_TIMESTAMP`).notNull(),
         daysLimit: integer("daysLimit").notNull(),
         daysPeriod: integer("daysPeriod"),
         // solo si es template
@@ -245,7 +249,7 @@ export const interventions = createTable(
             .$defaultFn(() => nanoid()),
         userId: uuid("userId").notNull().references(() => users.Id),
         otId: uuid("otId").notNull().references(() => ots.Id),
-        limitDate: int("limitDate", {mode:"timestamp"}).default(sql`CURRENT_TIMESTAMP`).notNull(),
+        limitDate: ts("limitDate").default(sql`CURRENT_TIMESTAMP`).notNull(),
         status: text("status"),
         orgId: uuid("orgId")
             .notNull()

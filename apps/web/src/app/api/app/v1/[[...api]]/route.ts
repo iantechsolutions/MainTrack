@@ -14,6 +14,7 @@ import { docCreateSchema, docListSchema } from '~/server/api/routers/doc_router'
 import { docTypeCreateSchema, docTypeListSchema } from '~/server/api/routers/doctype_router';
 import { schemaOrgInvite, schemaOrgPatch, schemaOrgPut, schemaOrgSetRole } from '~/server/api/routers/org_router';
 import { eqTypeCreateSchema, eqTypeListSchema } from '~/server/api/routers/eq_type_roouter';
+import { equipCreateSchema, equipEditLocationSchema, equipEditStatusSchema, equipListSchema } from '~/server/api/routers/equip_router';
 
 type HonoVariables = {
     uid: string
@@ -211,6 +212,49 @@ app.get('/p/eqtype/:orgId', async (c) => {
 app.post('/p/eqtype/list', zValidator('json', eqTypeListSchema), async (c) => {
     const api = await getApi();
     return c.json(await api.eqType.listFiltered(c.req.valid('json')));
+});
+
+app.put('/p/equipment', zValidator('json', equipCreateSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.create(c.req.valid('json')));
+});
+
+app.delete('/p/equipment/:eqId', async (c) => {
+    const api = await getApi();
+    return c.text(await api.equip.delete({
+        id: c.req.param('eqId')
+    }));
+});
+
+app.get('/p/equipment/:equipId', async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.get({
+        equipId: c.req.param('equipId')
+    }));
+});
+
+app.get('/p/equipment/list/:orgId', async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.list({
+        orgId: c.req.param('orgId')
+    }));
+});
+
+app.patch('/p/equipment/status', zValidator('json', equipEditStatusSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.editStatus(c.req.valid('json')));
+});
+
+app.patch('/p/equipment/location', zValidator('json', equipEditLocationSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.editLoc(c.req.valid('json')));
+});
+
+// lista filtrada
+// post porque los argumentos son un choclazo, para ponerlos en el body
+app.post('/p/equipment/list', zValidator('json', equipListSchema), async (c) => {
+    const api = await getApi();
+    return c.json(await api.equip.listFiltered(c.req.valid('json')));
 });
 
 export const GET = app.fetch

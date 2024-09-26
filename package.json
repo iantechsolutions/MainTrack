@@ -5,6 +5,8 @@
         "build": "turbo build",
         "dev": "turbo dev -- --turbo",
         "lint": "turbo lint",
+        "db:push": "cd apps/web; pnpm run db:push",
+        "db:studio": "cd apps/web; pnpm run db:studio",
         "format": "biome check . --apply-unsafe"
     },
     "devDependencies": {

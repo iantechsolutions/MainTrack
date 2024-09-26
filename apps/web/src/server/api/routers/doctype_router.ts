@@ -6,6 +6,7 @@ import { userInOrg, userSelectedOrg } from "~/server/utils/organization";
 import { TRPCError } from "@trpc/server";
 import { UserRoles } from "~/server/utils/roles";
 import { and, eq, ilike } from "drizzle-orm";
+import { ilikeSanitizedContains } from "~/server/utils/ilike";
 
 export const docTypeCreateSchema = z.object({
     typeName: z.string().min(1).max(1023),
@@ -102,11 +103,10 @@ export const docTypeRouter = createTRPCRouter({
                 throw new TRPCError({code: 'NOT_FOUND'});
             }
 
-            const ilikeQuery = `%${input.nameLike.replace('%', '').replace('_', '')}%`;
             const docTypes = await db.query.documentTypes.findMany({
                 where: and(
                     eq(schema.documentTypes.Id, userOrgEntry.orgId),
-                    ilike(schema.documentTypes.typeName, ilikeQuery)
+                    ilike(schema.documentTypes.typeName, ilikeSanitizedContains(input.nameLike))
                 )
             });
 

@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { UserRoles } from "~/server/utils/roles";
 import { db, schema } from "~/server/db";
 import { and, eq, gte, ilike, lte, SQLWrapper } from "drizzle-orm";
+import { ilikeSanitizedContains } from "~/server/utils/ilike";
 
 export const docCreateSchema = z.object({
     docType: z.string().min(1).max(1023),
@@ -160,8 +161,7 @@ export const docRouter = createTRPCRouter({
 
             const conditions: SQLWrapper[] = [eq(schema.documents.orgId, userOrgEntry.orgId)];
             if (input.docType) {
-                const ilikeQuery = `%${input.docType.replace('%', '').replace('_', '')}%`;
-                conditions.push(ilike(schema.documents.docType, ilikeQuery));
+                conditions.push(ilike(schema.documents.docType, ilikeSanitizedContains(input.docType)));
             }
 
             if (input.equCategoryId) {
