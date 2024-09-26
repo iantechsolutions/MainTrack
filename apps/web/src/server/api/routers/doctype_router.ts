@@ -9,107 +9,107 @@ import { and, eq, ilike } from "drizzle-orm";
 import { ilikeSanitizedContains } from "~/server/utils/ilike";
 
 export const docTypeCreateSchema = z.object({
-    typeName: z.string().min(1).max(1023),
-    description: z.string().min(1).max(1023),
-    correlatedWith: z.enum(DocCorrelatedWithEnum),
-    orgId: z.string().min(1).max(1023),
+  typeName: z.string().min(1).max(1023),
+  description: z.string().min(1).max(1023),
+  correlatedWith: z.enum(DocCorrelatedWithEnum),
+  orgId: z.string().min(1).max(1023),
 });
 
 export const docTypeListSchema = z.object({
-    orgId: z.string().min(1).max(1023),
-    nameLike: z.string().min(1).max(1023),
+  orgId: z.string().min(1).max(1023),
+  nameLike: z.string().min(1).max(1023),
 });
 
 export const docTypeRouter = createTRPCRouter({
-    create: protectedProcedure
-        .input(docTypeCreateSchema)
-        .mutation(async ({ input, ctx }) => {
-            const selfId = ctx.session.user.id;
-            const userOrgEntry = await userInOrg(selfId, input.orgId);
-            if (!userOrgEntry) {
-                throw new TRPCError({code: 'NOT_FOUND'});
-            }
+  create: protectedProcedure.input(docTypeCreateSchema).mutation(async ({ input, ctx }) => {
+    const selfId = ctx.session.user.id;
+    const userOrgEntry = await userInOrg(selfId, input.orgId);
+    if (!userOrgEntry) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
 
-            /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
+    /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
                 throw new TRPCError({code: 'FORBIDDEN'});
             } */
 
-            const res = await db.insert(schema.documentTypes)
-                .values({
-                    correlatedWith: input.correlatedWith, // enum chequeado por zod
-                    description: input.description,
-                    orgId: userOrgEntry.orgId,
-                    typeName: input.typeName,
-                })
-                .returning();
-            
-            if (res.length < 1 || !res[0]) {
-                throw new TRPCError({code: 'INTERNAL_SERVER_ERROR'});
-            }
+    const res = await db
+      .insert(schema.documentTypes)
+      .values({
+        correlatedWith: input.correlatedWith, // enum chequeado por zod
+        description: input.description,
+        orgId: userOrgEntry.orgId,
+        typeName: input.typeName,
+      })
+      .returning();
 
-            return res[0];
-        }),
-    delete: protectedProcedure
-        .input(z.object({
-            id: z.string().min(1).max(1023),
-        }))
-        .mutation(async ({ input, ctx }) => {
-            const selfId = ctx.session.user.id;
-            const docType = await db.query.documentTypes.findFirst({
-                where: eq(schema.documentTypes.Id, input.id),
-            });
+    if (res.length < 1 || !res[0]) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
 
-            if (!docType) {
-                throw new TRPCError({code: 'NOT_FOUND'});
-            }
+    return res[0];
+  }),
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1).max(1023),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const selfId = ctx.session.user.id;
+      const docType = await db.query.documentTypes.findFirst({
+        where: eq(schema.documentTypes.Id, input.id),
+      });
 
-            const userOrgEntry = await userInOrg(selfId, docType.orgId);
-            if (!userOrgEntry) {
-                throw new TRPCError({code: 'NOT_FOUND'});
-            }
-        
-            if (userOrgEntry.rol !== UserRoles.orgAdmin) {
-                throw new TRPCError({code: 'FORBIDDEN'});
-            }
+      if (!docType) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
-            await db.delete(schema.documentTypes)
-                .where(eq(schema.documentTypes.Id, docType.Id));
+      const userOrgEntry = await userInOrg(selfId, docType.orgId);
+      if (!userOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
-            return "ok";
-        }),
-    list: protectedProcedure
-        .input(z.object({
-            orgId: z.string().min(1).max(1023),
-        }))
-        .mutation(async ({ input, ctx }) => {
-            const selfId = ctx.session.user.id;
-            const userOrgEntry = await userInOrg(selfId, input.orgId);
-            if (!userOrgEntry) {
-                throw new TRPCError({code: 'NOT_FOUND'});
-            }
+      if (userOrgEntry.rol !== UserRoles.orgAdmin) {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
 
-            const docTypes = await db.query.documentTypes.findMany({
-                where: eq(schema.documentTypes.Id, userOrgEntry.orgId),
-            });
+      await db.delete(schema.documentTypes).where(eq(schema.documentTypes.Id, docType.Id));
 
-            return docTypes;
-        }),
-    listFiltered: protectedProcedure
-        .input(docTypeListSchema)
-        .mutation(async ({ input, ctx }) => {
-            const selfId = ctx.session.user.id;
-            const userOrgEntry = await userInOrg(selfId, input.orgId);
-            if (!userOrgEntry) {
-                throw new TRPCError({code: 'NOT_FOUND'});
-            }
+      return "ok";
+    }),
+  list: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.string().min(1).max(1023),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const selfId = ctx.session.user.id;
+      const userOrgEntry = await userInOrg(selfId, input.orgId);
+      if (!userOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
-            const docTypes = await db.query.documentTypes.findMany({
-                where: and(
-                    eq(schema.documentTypes.Id, userOrgEntry.orgId),
-                    ilike(schema.documentTypes.typeName, ilikeSanitizedContains(input.nameLike))
-                )
-            });
+      const docTypes = await db.query.documentTypes.findMany({
+        where: eq(schema.documentTypes.Id, userOrgEntry.orgId),
+      });
 
-            return docTypes;
-        }),
+      return docTypes;
+    }),
+  listFiltered: protectedProcedure.input(docTypeListSchema).mutation(async ({ input, ctx }) => {
+    const selfId = ctx.session.user.id;
+    const userOrgEntry = await userInOrg(selfId, input.orgId);
+    if (!userOrgEntry) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
+    const docTypes = await db.query.documentTypes.findMany({
+      where: and(
+        eq(schema.documentTypes.Id, userOrgEntry.orgId),
+        ilike(schema.documentTypes.typeName, ilikeSanitizedContains(input.nameLike)),
+      ),
+    });
+
+    return docTypes;
+  }),
 });

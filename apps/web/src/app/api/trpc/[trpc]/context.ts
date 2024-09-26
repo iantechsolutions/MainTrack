@@ -4,10 +4,10 @@ import { NextRequest } from "next/server";
 import { db } from "~/server/db";
 
 export const createContext = async (req: NextRequest) => {
-    const session = await getServerSession(nextAuthOptions);
-    return {
-        db,
-        session,
-        headers: req.headers,
-    };
+  const session = await getServerSession(nextAuthOptions);
+  return {
+    db,
+    session,
+    headers: req.headers,
+  };
 };

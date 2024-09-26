@@ -27,20 +27,10 @@ const t = initTRPC.context<typeof createContext>().create({
     let zodErrorMessage: string | null = null;
 
     if (error.cause instanceof ZodError) {
-      zodErrorMessage = fromZodError(error.cause)
-        .toString()
-        .replaceAll("; ", "\n")
-        .split(":")
-        .slice(1)
-        .join(":");
+      zodErrorMessage = fromZodError(error.cause).toString().replaceAll("; ", "\n").split(":").slice(1).join(":");
     }
     if (error.cause instanceof ZodError) {
-      zodErrorMessage = fromZodError(error.cause)
-        .toString()
-        .replaceAll("; ", "\n")
-        .split(":")
-        .slice(1)
-        .join(":");
+      zodErrorMessage = fromZodError(error.cause).toString().replaceAll("; ", "\n").split(":").slice(1).join(":");
     }
 
     return {
@@ -81,7 +71,7 @@ export const publicProcedure = t.procedure;
 
 /** Reusable middleware that enforces users are logged in before running the procedure. */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  const ctxCast = ctx as {session?: Session};
+  const ctxCast = ctx as { session?: Session };
 
   if (!ctxCast.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });

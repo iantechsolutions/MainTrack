@@ -1,1 +1,1 @@
-export const ilikeSanitizedContains = (v: string) => `%${v.replace('%', '').replace('_', '')}%`;
+export const ilikeSanitizedContains = (v: string) => `%${v.replace("%", "").replace("_", "")}%`;
