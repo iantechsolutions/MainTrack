@@ -48,7 +48,7 @@ export default function EquipmentNew({
               throw "!ref*.current";
             }
 
-            const res = await mut.mutateAsync({
+            await mut.mutateAsync({
               name: refName.current.value,
               location: {
                 lat: Number(refLocLat.current.value ?? 0) ?? 0,
@@ -63,7 +63,8 @@ export default function EquipmentNew({
               purchaseDate: null,
               warrantyExpiration: null,
             });
-            console.log(res);
+
+            window.history.back();
           })();
         }}
       >
@@ -75,7 +76,7 @@ export default function EquipmentNew({
         <br></br>
         <Input ref={refModel} type="text" id="model" name="model" />
         <br></br>
-        <Label>Manufacturer:</Label>
+        <Label>Fabricante:</Label>
         <br></br>
         <Input ref={refManufacturer} type="text" id="manuf" name="manuf" />
         <br></br>

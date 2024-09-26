@@ -216,8 +216,16 @@ app.delete("/p/eqtype/:eqTypeId", async (c) => {
   );
 });
 
-// lista de eqtypes de orgId
-app.get("/p/eqtype/:orgId", async (c) => {
+app.get("/p/eqtype/:eqTypeId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.eqType.get({
+      id: c.req.param("eqTypeId"),
+    }),
+  );
+});
+
+app.get("/p/eqtype/list/:orgId", async (c) => {
   const api = await getApi();
   return c.json(
     await api.eqType.list({

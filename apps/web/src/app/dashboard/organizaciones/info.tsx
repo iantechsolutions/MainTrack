@@ -38,7 +38,7 @@ export default function OrgsInfo({
               <p> Integrante Rol: {k.rol}</p>
             </div>
           ))}
-          <a href={`/organizaciones/${v.Id}`}>Ver</a>
+          <a href={`/dashboard/organizaciones/${v.Id}`}>Ver</a>
           <button
             onClick={async () => {
               const res = await mutSel.mutateAsync({

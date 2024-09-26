@@ -3,6 +3,8 @@
 import React from "react";
 import { InferSelectModel } from "drizzle-orm";
 import { schema } from "~/server/db";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
 
 export default function EquipmentList({
   equipment,
@@ -18,7 +20,7 @@ export default function EquipmentList({
           <p> Id: {u.Id}</p>
           <p> Nombre: {u.name}</p>
           <p> Modelo: {u.model}</p>
-          <p> Manufacturer: {u.manufacturer}</p>
+          <p> Fabricante: {u.manufacturer}</p>
           <p> Numero de serie: {u.serial}</p>
           <p>
             {" "}
@@ -31,6 +33,9 @@ export default function EquipmentList({
           <p> Status: {u.status}</p>
           <p> Fecha de compra: {u.purchaseDate?.toLocaleDateString()}</p>
           <p> Fecha de expiración de garantía: {u.warrantyExpiration?.toLocaleDateString()}</p>
+          <Link href={`/dashboard/equipos/${u.Id}`}>
+            <Button>Ver</Button>
+          </Link>
         </div>
       ))}
     </>

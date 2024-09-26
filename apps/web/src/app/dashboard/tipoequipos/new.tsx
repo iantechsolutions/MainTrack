@@ -21,12 +21,14 @@ export default function TipoEquipoNew({ orgId }: { orgId: string }) {
             if (!refName.current || !refDesc.current) {
               throw "!refName.current || !refDesc.current";
             }
-            const res = await mut.mutateAsync({
+
+            await mut.mutateAsync({
               name: refName.current.value,
               description: refDesc.current.value,
               orgId,
             });
-            console.log(res);
+
+            window.history.back();
           })();
         }}
       >

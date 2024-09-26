@@ -21,11 +21,13 @@ export default function OrgNew() {
             if (!refName.current) {
               throw "!refName.current";
             }
-            const res = await mut.mutateAsync({
+
+            await mut.mutateAsync({
               name: refName.current.value,
               // seleccionar: refName.current.checked
             });
-            console.log(res);
+
+            window.history.back();
           })();
         }}
       >

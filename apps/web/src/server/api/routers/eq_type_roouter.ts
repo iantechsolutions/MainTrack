@@ -27,8 +27,8 @@ export const eqTypeRouter = createTRPCRouter({
     }
 
     /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
-                throw new TRPCError({code: 'FORBIDDEN'});
-            } */
+      throw new TRPCError({code: 'FORBIDDEN'});
+    } */
 
     const res = await db
       .insert(schema.equipmentCategories)
@@ -109,4 +109,27 @@ export const eqTypeRouter = createTRPCRouter({
 
     return docTypes;
   }),
+  get: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().min(1).max(1023),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const selfId = ctx.session.user.id;
+      const eqType = await db.query.equipmentCategories.findFirst({
+        where: eq(schema.equipmentCategories.Id, input.id),
+      });
+
+      if (!eqType) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const userOrgEntry = await userInOrg(selfId, eqType.orgId);
+      if (!userOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return eqType;
+    }),
 });
