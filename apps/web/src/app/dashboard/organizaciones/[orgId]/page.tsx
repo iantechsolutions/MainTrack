@@ -1,11 +1,13 @@
 // import { getApi } from "~/trpc/server";
 // import OrgEdit from "./edit";
 
+import { DashScreen } from "~/components/screen";
+
 export default async function Page(/* props: { params: { orgId: string } } */) {
   return (
-    <>
+    <DashScreen>
       <h1>Editar</h1>
-    </>
+    </DashScreen>
   );
   // const api = await getApi();
   // const user = await api.user.get();
@@ -19,12 +21,7 @@ export default async function Page(/* props: { params: { orgId: string } } */) {
   //     users: await api.org.listUsers({orgId: user.orgSel})
   // };
 
-  // return <div style={{
-  //     'width': '100%',
-  //     'height': '100%',
-  //     'alignItems': 'center',
-  //     'justifyContent': 'center'
-  // }}>
+  // return <DashScreen>
   //     <p>Id: {orgData.org.Id}</p>
   //     <p>Name: {orgData.org.nombre}</p>
   //     <p>Users length: {orgData.users.length}</p>
@@ -39,5 +36,5 @@ export default async function Page(/* props: { params: { orgId: string } } */) {
   //     </div>)}
   //     <h3>Editar</h3>
   //     <OrgEdit />
-  // </div>;
+  // </DashScreen>;
 }

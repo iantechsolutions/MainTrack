@@ -1,4 +1,5 @@
 import React from "react";
+import { DashScreen } from "~/components/screen";
 // import { getBaseUrl } from '~/server/utils/other';
 
 export default async function Home() {
@@ -12,11 +13,12 @@ export default async function Home() {
   // console.log(testHono);
 
   return (
-    <div>
+    <DashScreen>
+      <p>Hola</p>
       {/* <a href="/dashboard">Dashboard {testHono}</a> */}
       {/* <SignInButton></SignInButton>
       <SignOutButton></SignOutButton>
       <UserButton></UserButton> */}
-    </div>
+    </DashScreen>
   );
 }

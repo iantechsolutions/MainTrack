@@ -39,41 +39,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
              */
             routerConfig={extractRouterConfig(ourFileRouter)}
           />
-          <header
-            style={{
-              left: 0,
-              top: 0,
-              width: "100%",
-              position: "fixed",
-              height: "70px",
-              backgroundColor: "#dddddd",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                height: "100%",
-                paddingLeft: "10px",
-                paddingRight: "10px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
+          <header className="fixed left-0 top-0 h-16 w-full bg-slate-200">
+            <div className="flex h-full items-center justify-between pl-2.5 pr-2.5">
+              <div className="flex h-full items-center">
                 <Image src="/favicon.ico" alt="logo" width={32} height={32} />
-                <h1
-                  style={{
-                    paddingLeft: "10px",
-                  }}
-                >
-                  MainTrack
-                </h1>
+                <h1 className="pl-2.5">MainTrack</h1>
               </div>
               <div>
                 {userData !== null ? (
@@ -87,21 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </header>
 
-          <aside
-            style={{
-              left: 0,
-              top: "70px",
-              width: "20%",
-              maxWidth: "60%",
-              height: "100%",
-              position: "fixed",
-              padding: "20px",
-              display: "flex",
-              flexDirection: "column",
-              backgroundColor: "#dddddd",
-              boxSizing: "border-box",
-            }}
-          >
+          <aside className="fixed left-0 top-16 box-border flex h-full w-1/4 flex-col bg-slate-200 p-5">
             <a href="/" className="text-red-800">
               Inicio
             </a>
@@ -126,15 +82,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             )}
           </aside>
 
-          <main
-            style={{
-              top: "70px",
-              left: "20%",
-              position: "fixed",
-              width: "80%",
-              height: "100%",
-            }}
-          >
+          <main className="fixed left-1/4 top-16 h-full w-3/4">
             <SessionBody>{children}</SessionBody>
           </main>
         </body>

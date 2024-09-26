@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { api } from "~/trpc/react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { DashScreen } from "~/components/screen";
 
 export default function SignUp() {
   const { data: session } = useSession();
@@ -13,14 +14,7 @@ export default function SignUp() {
   const mut = api.auth.signUp.useMutation();
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <DashScreen>
       {session ? (
         <p>Ya logueado</p>
       ) : (
@@ -57,6 +51,6 @@ export default function SignUp() {
           </form>
         </>
       )}
-    </div>
+    </DashScreen>
   );
 }

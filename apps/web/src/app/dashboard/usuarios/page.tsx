@@ -1,6 +1,7 @@
 import React from "react";
 import { getApi } from "~/trpc/server";
 import UserList from "./list";
+import { DashScreen } from "~/components/screen";
 
 export default async function Usuarios() {
   const api = await getApi();
@@ -12,15 +13,8 @@ export default async function Usuarios() {
   const users = await api.org.listUsers({ orgId: profile.orgSel });
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <DashScreen>
       <UserList users={users} />
-    </div>
+    </DashScreen>
   );
 }

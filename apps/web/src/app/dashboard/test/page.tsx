@@ -10,6 +10,7 @@ import OrgInvA from "./orginva";
 import OrgSel from "./orgsel";
 import Orgs from "./orgs";
 import Image from "next/image";
+import { DashScreen } from "~/components/screen";
 
 export default async function Home() {
   const api = await getApi();
@@ -30,7 +31,7 @@ export default async function Home() {
       : null;
 
   return (
-    <div>
+    <DashScreen>
       <p>tRPC Test {testQuery}</p>
       <div>
         <h1>Perfil</h1>
@@ -97,6 +98,6 @@ export default async function Home() {
         <h1>Aceptar invitación</h1>
         <OrgInvA></OrgInvA>
       </div>
-    </div>
+    </DashScreen>
   );
 }

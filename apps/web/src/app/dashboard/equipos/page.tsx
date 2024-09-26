@@ -2,6 +2,7 @@ import React from "react";
 import { getApi } from "~/trpc/server";
 import EquipmentList from "./list";
 import EquipmentNew from "./new";
+import { DashScreen } from "~/components/screen";
 
 export default async function Equipos() {
   const api = await getApi();
@@ -19,16 +20,9 @@ export default async function Equipos() {
   }
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <DashScreen>
       <EquipmentNew orgId={profile.orgSel} categories={eqTypes} />
       <EquipmentList categories={eqTypesMap} equipment={equips} />
-    </div>
+    </DashScreen>
   );
 }

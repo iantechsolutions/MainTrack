@@ -1,6 +1,7 @@
 import React from "react";
 import { getApi } from "~/trpc/server";
 import TipoEquipoNew from "./new";
+import { DashScreen } from "~/components/screen";
 
 export default async function TipoEquipos() {
   const api = await getApi();
@@ -16,14 +17,7 @@ export default async function TipoEquipos() {
   console.log(tipos);
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
+    <DashScreen>
       <h2>Tipos de Equipo</h2>
       <TipoEquipoNew orgId={self.orgSel} />
       {tipos.map((v) => (
@@ -32,6 +26,6 @@ export default async function TipoEquipos() {
           <p>Descripción: {v.description}</p>
         </div>
       ))}
-    </div>
+    </DashScreen>
   );
 }
