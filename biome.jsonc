@@ -17,7 +17,6 @@
         "formatter": {
             "quoteStyle": "single",
             "jsxQuoteStyle": "single",
-            "trailingComma": "all",
             "semicolons": "asNeeded",
             "quoteProperties": "asNeeded"
         }
@@ -48,7 +47,6 @@
                 "noUndeclaredVariables": "off"
             },
             "nursery": {
-                "noUselessTernary": "error",
                 "useSortedClasses": {
                     "level": "error",
                     "options": {

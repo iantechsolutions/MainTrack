@@ -11,8 +11,8 @@ import * as schema from "./schema";
 
 // import postgres from "postgres";
 // const queryClient = postgres(env.DATABASE_URL);
-import type { ExtractTablesWithRelations } from "drizzle-orm";
-import type { PgTransaction } from "drizzle-orm/pg-core";
+// import type { ExtractTablesWithRelations } from "drizzle-orm";
+// import type { PgTransaction } from "drizzle-orm/pg-core";
 // import {
 //   type PostgresJsQueryResultHKT,
 //   drizzle,

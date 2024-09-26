@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getAuthId = async (): Promise<string | null | undefined> => {
-    let auth = await getServerSession();
+    const auth = await getServerSession();
     if (auth) {
         return auth.user.name; // sí, uso el name de next-auth para los ids
     } else {

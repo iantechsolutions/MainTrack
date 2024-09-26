@@ -5,8 +5,6 @@ import { api } from "~/trpc/react";
 import { Label } from '~/components/ui/label';
 
 export default function ProfEdit() {
-    const refEPfname = useRef<HTMLInputElement>(null);
-    const refEPlname = useRef<HTMLInputElement>(null);
     const refEPuname = useRef<HTMLInputElement>(null);
 
     const mut = api.user.editSelf.useMutation();

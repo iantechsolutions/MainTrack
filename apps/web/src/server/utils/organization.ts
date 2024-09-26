@@ -7,7 +7,7 @@ export const userSelectedOrg = async (id: string): Promise<[
     InferSelectModel<typeof schema.organizaciones>,
     InferSelectModel<typeof schema.usuariosOrganizaciones>
 ] | null> => {
-    let selfUser = await db.query.users.findFirst({
+    const selfUser = await db.query.users.findFirst({
         where: eq(schema.users.Id, id)
     });
 
@@ -19,7 +19,7 @@ export const userSelectedOrg = async (id: string): Promise<[
         return null;
     }
 
-    let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+    const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
         with: {
             organizacion: true,
         },
@@ -41,7 +41,7 @@ export const userSelectedOrg = async (id: string): Promise<[
 }
 
 export const userInOrg = async (userId: string, orgId: string): Promise<InferSelectModel<typeof schema.usuariosOrganizaciones> | null> => {
-    let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+    const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
         where: and(
             eq(schema.usuariosOrganizaciones.orgId, orgId),
             eq(schema.usuariosOrganizaciones.userId, userId)

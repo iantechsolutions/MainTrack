@@ -9,12 +9,11 @@ import OrgInv from './orginv';
 import OrgInvA from './orginva';
 import OrgSel from './orgsel';
 import Orgs from './orgs';
-import { getAuthId } from '~/lib/utils';
+import Image from 'next/image';
 
 export default async function Home() {
     const api = await getApi();
     const testQuery = await api.test.test();
-    const auth = await getAuthId();
 
     const url = `${getBaseUrl()}/api/app/v1/p/test`;
     console.log(url);
@@ -65,7 +64,7 @@ export default async function Home() {
                         <p> Nombre: {u?.profile.username}</p>
                         <p> imageUrl: {u?.profile.imageUrl}</p>
                         {typeof u?.profile.imageUrl === 'string' && u?.profile.imageUrl.length > 0 ? (
-                            <img src={u.profile.imageUrl} width={32} height={32}></img>
+                            <Image src={u.profile.imageUrl} width={32} height={32} alt="no img" />
                         ) : <></>}
                         <p> rol: {u?.orgUser.rol}</p>
                     </div>)}

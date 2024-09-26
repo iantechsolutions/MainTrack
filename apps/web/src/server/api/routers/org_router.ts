@@ -36,7 +36,7 @@ export const orgRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
 
-            let selfUser = await db.query.users.findFirst({
+            const selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
 
@@ -44,7 +44,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let orgs = await db.insert(schema.organizaciones)
+            const orgs = await db.insert(schema.organizaciones)
                 .values({
                     nombre: input.name
                 })
@@ -54,13 +54,13 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
             }
 
-            let org = orgs[0];
+            const org = orgs[0];
             // redundante pero el linter se queja
             if (!org) {
                 throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' });
             }
 
-            let userOrg = await db.insert(schema.usuariosOrganizaciones)
+            const userOrg = await db.insert(schema.usuariosOrganizaciones)
                 .values({
                     orgId: org.Id,
                     userId: selfUser.Id,
@@ -91,14 +91,15 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
+
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let org = await db.query.organizaciones.findFirst({
+            const org = await db.query.organizaciones.findFirst({
                 where: eq(schema.organizaciones.Id, orgId)
             });
 
@@ -106,7 +107,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, org.Id),
                     eq(schema.usuariosOrganizaciones.userId, selfId)
@@ -134,7 +135,7 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
 
@@ -142,7 +143,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let org = await db.query.organizaciones.findFirst({
+            const org = await db.query.organizaciones.findFirst({
                 with: {
                     usuariosOrganizaciones: true,
                 },
@@ -154,7 +155,7 @@ export const orgRouter = createTRPCRouter({
             }
 
             let adminCount = 0;
-            for (let usuarioRol of org.usuariosOrganizaciones.map(v => v.rol)) {
+            for (const usuarioRol of org.usuariosOrganizaciones.map(v => v.rol)) {
                 if (usuarioRol === UserRoles.orgAdmin) {
                     adminCount++;
                 }
@@ -164,7 +165,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: 'CONFLICT', message: 'Many admins left' });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, org.Id),
                     eq(schema.usuariosOrganizaciones.userId, selfId)
@@ -177,7 +178,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            let orgUserEntries = await db.query.usuariosOrganizaciones.findMany({
+            const orgUserEntries = await db.query.usuariosOrganizaciones.findMany({
                 with: {
                     user: true
                 },
@@ -192,7 +193,7 @@ export const orgRouter = createTRPCRouter({
 
             // esto no necesita recorrer la tabla entera
             // cosa que un update para todos los orgSel === org.Id sí haría
-            for (let orgUser of orgUserEntries) {
+            for (const orgUser of orgUserEntries) {
                 if (orgUser.user.orgSel === org.Id) {
                     await db.update(schema.users)
                         .set({
@@ -234,14 +235,14 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, orgId),
                     eq(schema.usuariosOrganizaciones.userId, selfId)
@@ -252,7 +253,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let org = await db.query.organizaciones.findFirst({
+            const org = await db.query.organizaciones.findFirst({
                 where: eq(schema.organizaciones.Id, orgId)
             });
 
@@ -265,14 +266,14 @@ export const orgRouter = createTRPCRouter({
     list: protectedProcedure
         .query(async ({ ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let orgs = await db.query.usuariosOrganizaciones.findMany({
+            const orgs = await db.query.usuariosOrganizaciones.findMany({
                 with: {
                     organizacion: {
                         with: {
@@ -295,14 +296,14 @@ export const orgRouter = createTRPCRouter({
         }))
         .query(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUserB) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, input.orgId),
                     eq(schema.usuariosOrganizaciones.userId, selfId)
@@ -313,14 +314,14 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUsers = await db.query.usuariosOrganizaciones.findMany({
+            const orgUsers = await db.query.usuariosOrganizaciones.findMany({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, input.orgId),
                 ),
             });
 
-            let usersDetailed = [];
-            for (let user of orgUsers) {
+            const usersDetailed = [];
+            for (const user of orgUsers) {
                 usersDetailed.push({
                     profile: await db.query.users.findFirst({
                         where: eq(schema.users.Id, user.userId)
@@ -339,7 +340,7 @@ export const orgRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
 
-            let selfUser = await db.query.users.findFirst({
+            const selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUser) {
@@ -363,7 +364,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "BAD_REQUEST" });
             }
 
-            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     organizacion: true,
                 },
@@ -377,7 +378,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     user: true
                 },
@@ -391,7 +392,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "CONFLICT" });
             }
 
-            let targetUser = await db.query.users.findFirst({
+            const targetUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, userId)
             });
 
@@ -407,7 +408,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            let token = jwt.sign({
+            const token = jwt.sign({
                 orgId: orgSelfEntry.orgId,
                 targetUserId: targetUser.Id,
                 fromUserId: selfUser.Id
@@ -425,7 +426,7 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUserB = await db.query.users.findFirst({
+            const selfUserB = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUserB) {
@@ -451,7 +452,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "BAD_REQUEST" });
             }
 
-            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     organizacion: true,
                 },
@@ -467,7 +468,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     user: true
                 },
@@ -481,7 +482,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "CONFLICT" });
             }
 
-            let targetUser = await db.query.users.findFirst({
+            const targetUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, tokenClaims.targetUserId)
             });
 
@@ -506,7 +507,7 @@ export const orgRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
+            const selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
 
@@ -519,7 +520,7 @@ export const orgRouter = createTRPCRouter({
             } */
             // Nota: puede sacarse a si mismo si es admin, solo que no puede ser el ultimo admin en salir
 
-            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     organizacion: {
                         with: {
@@ -541,7 +542,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     user: true
                 },
@@ -564,7 +565,7 @@ export const orgRouter = createTRPCRouter({
                 }
 
                 let adminCount = 0;
-                for (let usuarioRol of org.usuariosOrganizaciones.map(v => v.rol)) {
+                for (const usuarioRol of org.usuariosOrganizaciones.map(v => v.rol)) {
                     if (usuarioRol === UserRoles.orgAdmin) {
                         adminCount++;
                     }
@@ -596,7 +597,7 @@ export const orgRouter = createTRPCRouter({
         .input(schemaOrgSetRole)
         .mutation(async ({ input, ctx }) => {
             const selfId = ctx.session.user.id;
-            let selfUser = await db.query.users.findFirst({
+            const selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUser) {
@@ -608,7 +609,7 @@ export const orgRouter = createTRPCRouter({
             } */
             // Nota: puede sacarse a si mismo si es admin, solo que no puede ser el ultimo admin en salir
 
-            let orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgSelfEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     organizacion: {
                         with: {
@@ -630,7 +631,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 with: {
                     user: true
                 },
@@ -671,14 +672,14 @@ export const orgRouter = createTRPCRouter({
             const selfId = ctx.session.user.id;
             const { orgId } = input;
 
-            let selfUser = await db.query.users.findFirst({
+            const selfUser = await db.query.users.findFirst({
                 where: eq(schema.users.Id, selfId)
             });
             if (!selfUser) {
                 throw new TRPCError({ code: "UNAUTHORIZED" });
             }
 
-            let org = await db.query.organizaciones.findFirst({
+            const org = await db.query.organizaciones.findFirst({
                 where: eq(schema.organizaciones.Id, orgId)
             });
 
@@ -686,7 +687,7 @@ export const orgRouter = createTRPCRouter({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
-            let orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+            const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
                 where: and(
                     eq(schema.usuariosOrganizaciones.orgId, org.Id),
                     eq(schema.usuariosOrganizaciones.userId, selfUser.Id)

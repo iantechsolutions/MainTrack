@@ -1,5 +1,4 @@
 import React from 'react';
-import { getAuthId } from '~/lib/utils';
 import { getApi } from '~/trpc/server';
 import TipoEquipoNew from './new';
 

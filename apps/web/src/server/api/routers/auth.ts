@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createTRPCRouter, publicProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { db, schema } from "~/server/db";
@@ -21,7 +21,7 @@ export const authSignupSchema = z.object({
 export const authRouter = createTRPCRouter({
     signUp: publicProcedure
         .input(authSignupSchema)    
-        .mutation(async ({ input, ctx }) => {
+        .mutation(async ({ input }) => {
             const { username, email, password } = input;
 
             const exists = await db.query.users.findFirst({
@@ -54,7 +54,7 @@ export const authRouter = createTRPCRouter({
         }),
     logIn: publicProcedure
         .input(authLoginSchema)    
-        .mutation(async ({ input, ctx }) => {
+        .mutation(async ({ input }) => {
             const {email, password } = input;
 
             const dbUser = await db.query.users.findFirst({

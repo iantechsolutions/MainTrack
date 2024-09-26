@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { DocCorrelatedWithEnum } from "~/server/utils/doc_types_correlation";
 import { db, schema } from "~/server/db";
-import { userInOrg, userSelectedOrg } from "~/server/utils/organization";
+import { userInOrg } from "~/server/utils/organization";
 import { TRPCError } from "@trpc/server";
 import { UserRoles } from "~/server/utils/roles";
 import { and, eq, ilike } from "drizzle-orm";

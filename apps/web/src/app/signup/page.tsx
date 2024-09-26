@@ -1,6 +1,6 @@
 'use client'
 import React, { useRef } from 'react';
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { api } from '~/trpc/react';
 import { Input } from "~/components/ui/input";
 import { Label } from '~/components/ui/label';

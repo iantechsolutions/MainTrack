@@ -7,13 +7,12 @@
  * need to use are documented accordingly near the end.
  */
 
-import { TRPCError, initTRPC } from "@trpc/server";
-import { getServerSession, Session } from "next-auth";
 import superjson from "superjson";
+import { TRPCError, initTRPC } from "@trpc/server";
+import { Session } from "next-auth";
 import { ZodError } from "zod";
-
 import { fromZodError } from "zod-validation-error";
-import { createContext } from "~/app/api/trpc/[trpc]/route";
+import { createContext } from "~/app/api/trpc/[trpc]/context";
 
 /**
  * 2. INITIALIZATION

@@ -1,7 +1,7 @@
-import { getApi } from "~/trpc/server";
-import OrgEdit from "./edit";
+// import { getApi } from "~/trpc/server";
+// import OrgEdit from "./edit";
 
-export default async function Page(props: { params: { orgId: string } }) {
+export default async function Page(/* props: { params: { orgId: string } } */) {
     return (
         <>
         <h1>Editar</h1>

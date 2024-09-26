@@ -1,5 +1,5 @@
 import React from 'react';
-import { getBaseUrl } from '~/server/utils/other';
+// import { getBaseUrl } from '~/server/utils/other';
 
 export default async function Home() {
   // const url = `${getBaseUrl()}/api/app/v1/p/test`;

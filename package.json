@@ -7,7 +7,7 @@
         "lint": "turbo lint",
         "db:push": "cd apps/web; pnpm run db:push",
         "db:studio": "cd apps/web; pnpm run db:studio",
-        "format": "biome check . --apply-unsafe"
+        "format": "biome check ."
     },
     "devDependencies": {
         "@biomejs/biome": "^1.6.4",

@@ -6,9 +6,8 @@ import { getAuthId } from '~/lib/utils';
 
 export default async function Organizaciones() {
     const api = await getApi();
-    let orgs = await api.org.list();
-    console.log(orgs);
-    let selfId = await getAuthId();
+    const orgs = await api.org.list();
+    const selfId = await getAuthId();
 
     return <div style={{
         'width': '100%',

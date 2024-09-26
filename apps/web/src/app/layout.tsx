@@ -7,6 +7,7 @@ import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { getAuthId } from "~/lib/utils";
+import Image from 'next/image';
 
 export const metadata = {
   title: 'MainTrack',
@@ -19,11 +20,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  let auth = await getAuthId();
-  let isLoggedIn = typeof auth === 'string';
+  const auth = await getAuthId();
+  const isLoggedIn = typeof auth === 'string';
   const api = await getApi();
-
-  let userData = isLoggedIn ? {
+  const userData = isLoggedIn ? {
     profile: await api.user.get(),
     orgs: await api.org.list(),
   } : null;
@@ -62,7 +62,7 @@ export default async function RootLayout({
                 'alignItems': 'center',
                 'height': '100%',
               }}>
-                <img src='/favicon.ico'></img>
+                <Image src='/favicon.ico' alt="logo"/>
                 <h1 style={{
                   'paddingLeft': '10px'
                 }}>MainTrack</h1>

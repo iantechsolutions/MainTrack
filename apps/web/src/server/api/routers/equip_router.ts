@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { userInOrg } from "~/server/utils/organization";
 import { db, schema } from "~/server/db";
 import { and, eq, ilike, SQLWrapper } from "drizzle-orm";
-import { EquipmentStatus, EquipmentStatusEnum } from "~/server/utils/equipment_status";
+import { EquipmentStatusEnum } from "~/server/utils/equipment_status";
 import { ilikeSanitizedContains } from "~/server/utils/ilike";
 import { UserRoles } from "~/server/utils/roles";
 

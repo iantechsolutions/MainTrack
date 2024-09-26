@@ -3,7 +3,7 @@ import 'server-only'
 import { headers } from 'next/headers'
 import { createCaller } from '~/server/api/root'
 import { getServerSession } from 'next-auth'
-import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/route'
+import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/next'
 import { db } from '~/server/db'
 
 export const serverClient = async () => {

@@ -1,20 +1,17 @@
 // import 'server-only';
 import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { env } from '~/env';
 import { zValidator } from '@hono/zod-validator';
 import { z } from 'zod';
 import { getApi } from '~/trpc/server';
-import { UserRolesEnum } from '~/server/utils/roles';
 import { authLoginSchema, authSignupSchema } from '~/server/api/routers/auth';
 import { editSelfSchema } from '~/server/api/routers/user_router';
 import { getServerSession } from 'next-auth';
-import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/route';
 import { docCreateSchema, docListSchema } from '~/server/api/routers/doc_router';
 import { docTypeCreateSchema, docTypeListSchema } from '~/server/api/routers/doctype_router';
 import { schemaOrgInvite, schemaOrgPatch, schemaOrgPut, schemaOrgSetRole } from '~/server/api/routers/org_router';
 import { eqTypeCreateSchema, eqTypeListSchema } from '~/server/api/routers/eq_type_roouter';
 import { equipCreateSchema, equipEditLocationSchema, equipEditStatusSchema, equipListSchema } from '~/server/api/routers/equip_router';
+import { nextAuthOptions } from '~/app/api/auth/[...nextauth]/next';
 
 type HonoVariables = {
     uid: string
