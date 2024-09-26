@@ -1,3 +1,4 @@
+import '~/styles/globals.css'
 import { TRPCReactProvider } from "~/trpc/react"
 import OrgSel from "~/components/orgsel";
 import { getApi } from "~/trpc/server";
@@ -75,7 +76,7 @@ export default async function RootLayout({
             'backgroundColor': '#dddddd',
             'boxSizing': 'border-box'
           }}>
-            <a href="/">Inicio</a>
+            <a href="/" className=' text-red-800'>Inicio</a>
             {userData !== null ? <>
               <a href="/dashboard/organizaciones">Organizaciones</a>
               <a href="/dashboard/usuarios">Usuarios</a>
