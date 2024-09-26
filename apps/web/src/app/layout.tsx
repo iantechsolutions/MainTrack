@@ -66,7 +66,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   height: "100%",
                 }}
               >
-                <Image src="/favicon.ico" alt="logo" />
+                <Image src="/favicon.ico" alt="logo" width={32} height={32} />
                 <h1
                   style={{
                     paddingLeft: "10px",
