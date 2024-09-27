@@ -4,6 +4,7 @@
 import { DashScreen } from "~/components/screen";
 import { getApi } from "~/trpc/server";
 import { EquipmentStatusText } from "~/server/utils/equipment_status";
+import EquipoQr from "./qr";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const api = await getApi();
@@ -32,6 +33,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <p>
         Categoría: {category.Id} ({category.name})
       </p>
+      <EquipoQr />
     </DashScreen>
   );
 }
