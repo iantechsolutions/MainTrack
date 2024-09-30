@@ -87,7 +87,7 @@ export const equipment = createTable("equipment", {
     .references(() => organizaciones.Id),
 });
 
-export const equiposRelations = relations(equipment, ({ one }) => ({
+export const equiposRelations = relations(equipment, ({ one, many }) => ({
   categoryId: one(equipmentCategories, {
     fields: [equipment.categoryId],
     references: [equipmentCategories.Id],
@@ -96,6 +96,8 @@ export const equiposRelations = relations(equipment, ({ one }) => ({
     fields: [equipment.orgId],
     references: [organizaciones.Id],
   }),
+  photos: many(equipmentPhotos),
+  ots: many(ots),
 }));
 
 export const equipmentCategories = createTable("equipmentCategories", {
@@ -207,20 +209,32 @@ export const ots = createTable("ots", {
   date: ts("date")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
+  templateLastUsed: ts("templateLastUsed"),
   daysLimit: integer("daysLimit").notNull(),
   daysPeriod: integer("daysPeriod"),
   // solo si es template
-  tipoEquipoId: uuid("tipoEquipoId").references(() => equipmentCategories.Id),
+  tipoEquipoId: uuid("tipoEquipoId"),
+  equipoId: uuid("equipoId"),
+  templateId: uuid("templateId"),
   orgId: uuid("orgId")
     .notNull()
     .references(() => organizaciones.Id),
 });
 
-export const otsRelations = relations(ots, ({ one }) => ({
+export const otsRelations = relations(ots, ({ one, many }) => ({
   tipoEquipoId: one(equipmentCategories, {
     fields: [ots.tipoEquipoId],
     references: [equipmentCategories.Id],
   }),
+  equipoId: one(equipment, {
+    fields: [ots.equipoId],
+    references: [equipment.Id],
+  }),
+  templateId: one(ots, {
+    fields: [ots.templateId],
+    references: [ots.Id],
+  }),
+  interventions: many(interventions),
 }));
 
 export const interventions = createTable("interventions", {

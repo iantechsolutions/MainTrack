@@ -10,8 +10,18 @@ import { docCreateSchema, docListSchema } from "~/server/api/routers/doc_router"
 import { docTypeCreateSchema, docTypeListSchema } from "~/server/api/routers/doctype_router";
 import { schemaOrgInvite, schemaOrgPatch, schemaOrgPut, schemaOrgSetRole } from "~/server/api/routers/org_router";
 import { eqTypeCreateSchema, eqTypeListSchema } from "~/server/api/routers/eq_type_roouter";
-import { equipCreateSchema, equipEditLocationSchema, equipEditStatusSchema, equipListSchema } from "~/server/api/routers/equip_router";
+import {
+  equipCreateSchema,
+  equipEditLocationSchema,
+  equipEditStatusSchema,
+  equipListSchema,
+  equipPhotoPutSchema,
+} from "~/server/api/routers/equip_router";
 import { nextAuthOptions } from "~/app/api/auth/[...nextauth]/next";
+import { utapi } from "~/server/uploadthing";
+import { UTFile } from "uploadthing/server";
+import { nanoid } from "nanoid";
+import { otCreateSchema, otEditSchema } from "~/server/api/routers/ots_router";
 
 type HonoVariables = {
   uid: string;
@@ -288,6 +298,112 @@ app.patch("/p/equipment/location", zValidator("json", equipEditLocationSchema), 
 app.post("/p/equipment/list", zValidator("json", equipListSchema), async (c) => {
   const api = await getApi();
   return c.json(await api.equip.listFiltered(c.req.valid("json")));
+});
+
+// ver /p/file
+app.post("/p/equipment/photo", zValidator("json", equipPhotoPutSchema), async (c) => {
+  const api = await getApi();
+  return c.json(await api.equip.photoPut(c.req.valid("json")));
+});
+
+app.delete("/p/equipment/photo/:Id", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.equip.photoDel({
+      photoId: c.req.param("Id"),
+    }),
+  );
+});
+
+app.get("/p/equipment/photos/:equipId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.equip.photoList({
+      equipId: c.req.param("equipId"),
+    }),
+  );
+});
+
+app.get("/p/ot/:Id", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.ots.get({
+      Id: c.req.param("Id"),
+    }),
+  );
+});
+
+app.get("/p/ot/list/org/:orgId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.ots.listOrg({
+      orgId: c.req.param("orgId"),
+    }),
+  );
+});
+
+app.get("/p/ot/list/eqtype/:eqTypeId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.ots.listEqType({
+      eqTypeId: c.req.param("eqTypeId"),
+    }),
+  );
+});
+
+app.get("/p/ot/list/equip/:equipId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.ots.listEquipo({
+      equipId: c.req.param("equipId"),
+    }),
+  );
+});
+
+app.put("/p/ot", zValidator("json", otCreateSchema), async (c) => {
+  const api = await getApi();
+  return c.json(await api.ots.create(c.req.valid("json")));
+});
+
+// edit
+app.post("/p/ot", zValidator("json", otEditSchema), async (c) => {
+  const api = await getApi();
+  return c.json(await api.ots.edit(c.req.valid("json")));
+});
+
+app.delete("/p/ot/:Id", async (c) => {
+  const api = await getApi();
+  return c.json(await api.ots.delete({ id: c.req.param("Id") }));
+});
+
+const putFileSchema = z.object({
+  data64: z.string(),
+  filename: z.string().nullable(),
+});
+
+// upload archivo generico base64
+app.put("/p/file", zValidator("json", putFileSchema), async (c) => {
+  const data = c.req.valid("json");
+
+  const decoded = atob(data.data64);
+  /* const byteArray = new Uint8Array(decoded.length);
+  for (let i = 0; i < decoded.length; i++) {
+    byteArray[i] = decoded.charCodeAt(i);
+  } */
+
+  const file = new UTFile([decoded], data.filename ?? `${nanoid()}.file`);
+  const res = await utapi.uploadFiles([file]);
+  return c.json(
+    res.map((file) => {
+      return {
+        name: file.data?.name,
+        url: file.data?.url,
+        size: file.data?.size,
+        type: file.data?.type,
+        error_code: file.error?.code,
+      };
+    }),
+  );
 });
 
 export const GET = app.fetch;

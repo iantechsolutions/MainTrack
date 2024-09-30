@@ -14,13 +14,16 @@ export default function OrgSel({
 }) {
   const mut = api.org.select.useMutation();
   return (
-    <Select onValueChange={async (v) => {
-      const res = await mut.mutateAsync({
-        orgId: v,
-      });
-      console.log(res);
-      window.location.reload();
-    }} defaultValue={orgSel ?? undefined}>
+    <Select
+      onValueChange={async (v) => {
+        const res = await mut.mutateAsync({
+          orgId: v,
+        });
+        console.log(res);
+        window.location.reload();
+      }}
+      defaultValue={orgSel ?? undefined}
+    >
       <SelectTrigger className="w-[180px]">
         <SelectValue placeholder="Organización" />
       </SelectTrigger>
@@ -29,10 +32,10 @@ export default function OrgSel({
           <SelectLabel>Organización</SelectLabel>
           <>
             {orgs.map((o) => (
-            <SelectItem key={`opt-${o.Id}`} value={o.Id}>
-              {o.nombre}
-            </SelectItem>
-          ))}
+              <SelectItem key={`opt-${o.Id}`} value={o.Id}>
+                {o.nombre}
+              </SelectItem>
+            ))}
           </>
         </SelectGroup>
       </SelectContent>

@@ -9,7 +9,7 @@ import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { getAuthId } from "~/lib/utils";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
-import { Computer, FileSliders, KeyRound, Users, BriefcaseBusiness, LayoutGrid, UserPlus } from 'lucide-react';
+import { Computer, FileSliders, KeyRound, Users, BriefcaseBusiness, LayoutGrid, UserPlus } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -61,31 +61,31 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </header>
 
           <aside className="fixed left-0 top-16 box-border flex h-full w-1/4 flex-col p-5">
-            <Button asChild className="h-12 text-1xl">
+            <Button asChild className="text-1xl h-12">
               <Link href="/">
                 <LayoutGrid className="mr-2 h-4 w-4" /> Inicio
               </Link>
             </Button>
             {userData !== null ? (
               <>
-                <Button asChild className="h-12 text-1xl">
+                <Button asChild className="text-1xl h-12">
                   <Link href="/dashboard/organizaciones">
                     <BriefcaseBusiness className="mr-2 h-4 w-4" /> Organizaciones
                   </Link>
                 </Button>
                 {userData.profile.orgSel !== null ? (
                   <>
-                    <Button asChild className="h-12 text-1xl">
+                    <Button asChild className="text-1xl h-12">
                       <Link href="/dashboard/usuarios">
                         <Users className="mr-2 h-4 w-4" /> Usuarios
                       </Link>
                     </Button>
-                    <Button asChild className="h-12 text-1xl">
+                    <Button asChild className="text-1xl h-12">
                       <Link href="/dashboard/tipoequipos">
                         <FileSliders className="mr-2 h-4 w-4" /> Tipos de equipos
                       </Link>
                     </Button>
-                    <Button asChild className="h-12 text-1xl">
+                    <Button asChild className="text-1xl h-12">
                       <Link href="/dashboard/equipos">
                         <Computer className="mr-2 h-4 w-4" /> Equipos
                       </Link>
@@ -97,12 +97,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </>
             ) : (
               <>
-                <Button asChild className="h-12 text-1xl">
+                <Button asChild className="text-1xl h-12">
                   <Link href="/login">
                     <KeyRound className="mr-2 h-4 w-4" /> Iniciar Sesión
                   </Link>
                 </Button>
-                <Button asChild className="h-12 text-1xl">
+                <Button asChild className="text-1xl h-12">
                   <Link href="/signup">
                     <UserPlus className="mr-2 h-4 w-4" /> Crear Cuenta
                   </Link>

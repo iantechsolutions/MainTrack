@@ -8,6 +8,7 @@ import { docTypeRouter } from "./routers/doctype_router";
 import { docRouter } from "./routers/doc_router";
 import { eqTypeRouter } from "./routers/eq_type_roouter";
 import { equipRouter } from "./routers/equip_router";
+import { otsRouter } from "./routers/ots_router";
 
 export const appRouter = createTRPCRouter({
   org: orgRouter,
@@ -18,6 +19,7 @@ export const appRouter = createTRPCRouter({
   doc: docRouter,
   eqType: eqTypeRouter,
   equip: equipRouter,
+  ots: otsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

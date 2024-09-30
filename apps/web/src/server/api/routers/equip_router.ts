@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import { userInOrg } from "~/server/utils/organization";
 import { db, schema } from "~/server/db";
-import { and, eq, ilike, SQLWrapper } from "drizzle-orm";
+import { and, eq, ilike, inArray, SQLWrapper } from "drizzle-orm";
 import { EquipmentStatusEnum } from "~/server/utils/equipment_status";
 import { ilikeSanitizedContains } from "~/server/utils/ilike";
 import { UserRoles } from "~/server/utils/roles";
@@ -44,6 +44,12 @@ export const equipEditLocationSchema = z.object({
     lat: z.number(),
     lon: z.number(),
   }),
+});
+
+export const equipPhotoPutSchema = z.object({
+  id: z.string().min(1).max(1023),
+  imgUrl: z.string().min(1).max(1023),
+  description: z.string().max(4096),
 });
 
 export const equipRouter = createTRPCRouter({
@@ -146,7 +152,33 @@ export const equipRouter = createTRPCRouter({
         throw new TRPCError({ code: "FORBIDDEN" });
       }
 
-      await db.delete(schema.equipment).where(eq(schema.equipment.Id, equipment.Id));
+      const allInterventions = new Set<string>();
+      const ots = await db.query.ots.findMany({
+        with: {
+          interventions: true,
+        },
+        where: and(eq(schema.ots.orgId, equipment.orgId), eq(schema.ots.equipoId, equipment.Id)),
+      });
+
+      for (const interv of ots.map((k) => k.interventions).flat()) {
+        if (!allInterventions.has(interv.Id)) {
+          allInterventions.add(interv.Id);
+        }
+      }
+
+      await db.transaction(async (tx) => {
+        await tx
+          .delete(schema.equipmentPhotos)
+          .where(and(eq(schema.equipmentPhotos.orgId, equipment.orgId), eq(schema.equipmentPhotos.equipmentId, equipment.Id)));
+        await tx
+          .delete(schema.documents)
+          .where(and(eq(schema.documents.orgId, equipment.orgId), eq(schema.documents.equipmentId, equipment.Id)));
+        await tx
+          .delete(schema.interventions)
+          .where(and(eq(schema.interventions.orgId, equipment.orgId), inArray(schema.interventions.Id, Array.from(allInterventions))));
+        await tx.delete(schema.ots).where(and(eq(schema.ots.orgId, equipment.orgId), eq(schema.ots.equipoId, equipment.Id)));
+        await tx.delete(schema.equipment).where(eq(schema.equipment.Id, equipment.Id));
+      });
 
       return "ok";
     }),
@@ -208,8 +240,8 @@ export const equipRouter = createTRPCRouter({
     }
 
     /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
-                throw new TRPCError({code: 'FORBIDDEN'});
-            } */
+        throw new TRPCError({code: 'FORBIDDEN'});
+    } */
 
     const res = await db
       .update(schema.equipment)
@@ -241,8 +273,8 @@ export const equipRouter = createTRPCRouter({
     }
 
     /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
-                throw new TRPCError({code: 'FORBIDDEN'});
-            } */
+        throw new TRPCError({code: 'FORBIDDEN'});
+    } */
 
     const res = await db
       .update(schema.equipment)
@@ -259,4 +291,97 @@ export const equipRouter = createTRPCRouter({
 
     return res[0];
   }),
+  photoPut: protectedProcedure.input(equipPhotoPutSchema).mutation(async ({ ctx, input }) => {
+    const selfId = ctx.session.user.id;
+    const equipment = await db.query.equipment.findFirst({
+      where: eq(schema.equipment.Id, input.id),
+    });
+
+    if (!equipment) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
+    const userOrgEntry = await userInOrg(selfId, equipment.orgId);
+    if (!userOrgEntry) {
+      throw new TRPCError({ code: "NOT_FOUND" });
+    }
+
+    /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
+          throw new TRPCError({code: 'FORBIDDEN'});
+      } */
+
+    const res = await db
+      .insert(schema.equipmentPhotos)
+      .values({
+        description: input.description,
+        equipmentId: equipment.Id,
+        orgId: equipment.orgId,
+        photoUrl: input.imgUrl,
+      })
+      .returning();
+
+    if (res.length < 1 || !res[0]) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+
+    return res[0];
+  }),
+  photoDel: protectedProcedure
+    .input(
+      z.object({
+        photoId: z.string().min(1).max(1023),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const selfId = ctx.session.user.id;
+      const eqPhoto = await db.query.equipmentPhotos.findFirst({
+        with: {
+          equipmentId: true,
+        },
+        where: eq(schema.equipmentPhotos.Id, input.photoId),
+      });
+
+      if (!eqPhoto) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const userOrgEntry = await userInOrg(selfId, eqPhoto.orgId);
+      if (!userOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      /* if (userOrgEntry.rol !== UserRoles.orgAdmin) {
+          throw new TRPCError({code: 'FORBIDDEN'});
+      } */
+
+      await db.delete(schema.equipmentPhotos).where(eq(schema.equipmentPhotos.Id, eqPhoto.Id));
+
+      return "ok";
+    }),
+  photoList: protectedProcedure
+    .input(
+      z.object({
+        equipId: z.string().min(1).max(1023),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const selfId = ctx.session.user.id;
+      const equipment = await db.query.equipment.findFirst({
+        with: {
+          photos: true,
+        },
+        where: eq(schema.equipment.Id, input.equipId),
+      });
+
+      if (!equipment) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const userOrgEntry = await userInOrg(selfId, equipment.orgId);
+      if (!userOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return equipment.photos;
+    }),
 });
