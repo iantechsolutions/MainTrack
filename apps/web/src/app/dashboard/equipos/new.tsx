@@ -30,7 +30,7 @@ export default function EquipmentNew({
 
   return (
     <>
-      <h1>Crear organización</h1>
+      <h1>Crear equipo</h1>
       <form
         onSubmit={(e) => {
           e.preventDefault();

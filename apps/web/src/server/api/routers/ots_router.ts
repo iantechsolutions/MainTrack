@@ -19,7 +19,7 @@ export const otCreateSchema = z.object({
   daysLimit: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER),
   daysPeriod: z.number().int().min(1).max(Number.MAX_SAFE_INTEGER).nullable(),
   orgId: z.string().min(1).max(1023),
-  interventionUserId: z.string().min(1).max(1023),
+  interventionUserId: z.string().min(1).max(1023).nullable(),
 });
 
 export const otEditSchema = z.object({
@@ -39,6 +39,9 @@ export const otsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const selfId = ctx.session.user.id;
       const ot = await db.query.ots.findFirst({
+        with: {
+          templateId: true,
+        },
         where: eq(schema.ots.Id, input.Id),
       });
 
@@ -68,6 +71,9 @@ export const otsRouter = createTRPCRouter({
     }
 
     const ots = await db.query.ots.findMany({
+      with: {
+        templateId: true,
+      },
       where: eq(schema.ots.orgId, userOrgEntry.orgId),
     });
 
@@ -83,7 +89,11 @@ export const otsRouter = createTRPCRouter({
       const selfId = ctx.session.user.id;
       const eqType = await db.query.equipmentCategories.findFirst({
         with: {
-          ots: true,
+          ots: {
+            with: {
+              templateId: true,
+            },
+          },
         },
         where: eq(schema.equipmentCategories.Id, input.eqTypeId),
       });
@@ -109,7 +119,11 @@ export const otsRouter = createTRPCRouter({
       const selfId = ctx.session.user.id;
       const equip = await db.query.equipment.findFirst({
         with: {
-          ots: true,
+          ots: {
+            with: {
+              templateId: true,
+            },
+          },
         },
         where: eq(schema.equipment.Id, input.equipId),
       });
@@ -128,7 +142,6 @@ export const otsRouter = createTRPCRouter({
   create: protectedProcedure.input(otCreateSchema).mutation(async ({ ctx, input }) => {
     const selfId = ctx.session.user.id;
     const userOrgEntry = await userInOrg(selfId, input.orgId);
-    const userIntOrgEntry = await userInOrg(input.interventionUserId, input.orgId);
 
     let template: InferSelectModel<typeof schema.ots> | null = null;
     let equipo: InferSelectModel<typeof schema.equipment> | null = null;
@@ -136,8 +149,6 @@ export const otsRouter = createTRPCRouter({
 
     if (!userOrgEntry) {
       throw new TRPCError({ code: "NOT_FOUND", message: "No userOrgEntry" });
-    } else if (!userIntOrgEntry) {
-      throw new TRPCError({ code: "NOT_FOUND", message: "No userIntOrgEntry" });
     }
 
     if (typeof input.fromTemplate === "string" && typeof input.templateEqType === "string") {
@@ -201,6 +212,18 @@ export const otsRouter = createTRPCRouter({
       throw new TRPCError({ code: "BAD_REQUEST" });
     }
 
+    let userIntOrgEntry: null | InferSelectModel<typeof schema.usuariosOrganizaciones> = null;
+    if (!isTemplate) {
+      if (typeof input.interventionUserId !== "string") {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      userIntOrgEntry = (await userInOrg(input.interventionUserId, input.orgId)) ?? null;
+      if (!userIntOrgEntry) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "No userIntOrgEntry" });
+      }
+    }
+
     const res = await db
       .insert(schema.ots)
       .values({
@@ -213,6 +236,7 @@ export const otsRouter = createTRPCRouter({
         isTemplate,
         templateId: template?.Id,
         tipoEquipoId: eqType?.Id,
+        date: new Date(),
       })
       .returning();
 
@@ -221,31 +245,34 @@ export const otsRouter = createTRPCRouter({
     }
 
     const ot = res[0];
-    let intervention;
-    try {
-      const intDate = new Date();
-      intDate.setDate(intDate.getDate() + ot.daysLimit);
+    let intervention: null | InferSelectModel<typeof schema.interventions> = null;
 
-      const interventions = await db
-        .insert(schema.interventions)
-        .values({
-          otId: ot.Id,
-          orgId: ot.orgId,
-          userId: userIntOrgEntry.userId,
-          status: IntStatus.Pending,
-          limitDate: intDate,
-        })
-        .returning();
+    if (userIntOrgEntry !== null) {
+      try {
+        const intDate = new Date();
+        intDate.setDate(intDate.getDate() + ot.daysLimit);
 
-      // si, esto cae en el catch
-      if (interventions.length < 1 || !interventions[0]) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "failed to insert interv" });
+        const interventions = await db
+          .insert(schema.interventions)
+          .values({
+            otId: ot.Id,
+            orgId: ot.orgId,
+            userId: userIntOrgEntry.userId,
+            status: IntStatus.Pending,
+            limitDate: intDate,
+          })
+          .returning();
+
+        // si, esto cae en el catch
+        if (interventions.length < 1 || !interventions[0]) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "failed to insert interv" });
+        }
+
+        intervention = interventions[0];
+      } catch (e) {
+        console.error("inserting intervention failed (ot create):", e);
+        await db.delete(schema.ots).where(eq(schema.ots.Id, ot.Id));
       }
-
-      intervention = interventions[0];
-    } catch (e) {
-      console.error("inserting intervention failed (ot create):", e);
-      await db.delete(schema.ots).where(eq(schema.ots.Id, ot.Id));
     }
 
     if (template !== null) {

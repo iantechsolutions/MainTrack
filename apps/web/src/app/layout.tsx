@@ -9,7 +9,7 @@ import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { getAuthId } from "~/lib/utils";
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
-import { Computer, FileSliders, KeyRound, Users, BriefcaseBusiness, LayoutGrid, UserPlus } from "lucide-react";
+import { Computer, FileSliders, KeyRound, Users, BriefcaseBusiness, LayoutGrid, UserPlus, PersonStanding } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
@@ -88,6 +88,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <Button asChild className="text-1xl h-12">
                       <Link href="/dashboard/equipos">
                         <Computer className="mr-2 h-4 w-4" /> Equipos
+                      </Link>
+                    </Button>
+                    <Button asChild className="text-1xl h-12">
+                      <Link href="/dashboard/ots">
+                        <PersonStanding className="mr-2 h-4 w-4" /> Órdenes de trabajo
                       </Link>
                     </Button>
                   </>
