@@ -5,6 +5,7 @@ import { api } from "~/trpc/react";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { DashScreen } from "~/components/screen";
+import { Button } from "~/components/ui/button";
 
 export default function SignUp() {
   const { data: session } = useSession();
@@ -47,7 +48,7 @@ export default function SignUp() {
             <br></br>
             <Input ref={refPassword} type="password" id="pswd" name="pswd"></Input>
             <br></br>
-            <button type="submit">Submit</button>
+            <Button type="submit">Submit</Button>
           </form>
         </>
       )}

@@ -8,6 +8,9 @@ import { extractRouterConfig } from "uploadthing/server";
 import { ourFileRouter } from "~/app/api/uploadthing/core";
 import { getAuthId } from "~/lib/utils";
 import Image from "next/image";
+import { Button } from "~/components/ui/button";
+import { Computer, FileSliders, KeyRound, Users, BriefcaseBusiness, LayoutGrid, UserPlus } from 'lucide-react';
+import Link from "next/link";
 
 export const metadata = {
   title: "MainTrack",
@@ -39,7 +42,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
              */
             routerConfig={extractRouterConfig(ourFileRouter)}
           />
-          <header className="fixed left-0 top-0 h-16 w-full bg-slate-200">
+          <header className="fixed left-0 top-0 h-16 w-full">
             <div className="flex h-full items-center justify-between pl-2.5 pr-2.5">
               <div className="flex h-full items-center">
                 <Image src="/favicon.ico" alt="logo" width={32} height={32} />
@@ -57,18 +60,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </div>
           </header>
 
-          <aside className="fixed left-0 top-16 box-border flex h-full w-1/4 flex-col bg-slate-200 p-5">
-            <a href="/" className="text-red-800">
-              Inicio
-            </a>
+          <aside className="fixed left-0 top-16 box-border flex h-full w-1/4 flex-col p-5">
+            <Button asChild className="h-12 text-1xl">
+              <Link href="/">
+                <LayoutGrid className="mr-2 h-4 w-4" /> Inicio
+              </Link>
+            </Button>
             {userData !== null ? (
               <>
-                <a href="/dashboard/organizaciones">Organizaciones</a>
+                <Button asChild className="h-12 text-1xl">
+                  <Link href="/dashboard/organizaciones">
+                    <BriefcaseBusiness className="mr-2 h-4 w-4" /> Organizaciones
+                  </Link>
+                </Button>
                 {userData.profile.orgSel !== null ? (
                   <>
-                    <a href="/dashboard/usuarios">Usuarios</a>
-                    <a href="/dashboard/tipoequipos">Tipos de Equipos</a>
-                    <a href="/dashboard/equipos">Equipos</a>
+                    <Button asChild className="h-12 text-1xl">
+                      <Link href="/dashboard/usuarios">
+                        <Users className="mr-2 h-4 w-4" /> Usuarios
+                      </Link>
+                    </Button>
+                    <Button asChild className="h-12 text-1xl">
+                      <Link href="/dashboard/tipoequipos">
+                        <FileSliders className="mr-2 h-4 w-4" /> Tipos de equipos
+                      </Link>
+                    </Button>
+                    <Button asChild className="h-12 text-1xl">
+                      <Link href="/dashboard/equipos">
+                        <Computer className="mr-2 h-4 w-4" /> Equipos
+                      </Link>
+                    </Button>
                   </>
                 ) : (
                   <></>
@@ -76,8 +97,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </>
             ) : (
               <>
-                <a href="/login">Iniciar Sesión</a>
-                <a href="/signup">Crear Cuenta</a>
+                <Button asChild className="h-12 text-1xl">
+                  <Link href="/login">
+                    <KeyRound className="mr-2 h-4 w-4" /> Iniciar Sesión
+                  </Link>
+                </Button>
+                <Button asChild className="h-12 text-1xl">
+                  <Link href="/signup">
+                    <UserPlus className="mr-2 h-4 w-4" /> Crear Cuenta
+                  </Link>
+                </Button>
               </>
             )}
           </aside>

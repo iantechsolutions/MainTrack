@@ -2,6 +2,7 @@
 import React from "react";
 import { useSession, signIn } from "next-auth/react";
 import { DashScreen } from "~/components/screen";
+import { Button } from "~/components/ui/button";
 
 export default function LogIn() {
   const { data: session } = useSession();
@@ -11,13 +12,13 @@ export default function LogIn() {
       {session ? (
         <p>Ya logueado</p>
       ) : (
-        <button
+        <Button
           onClick={() => {
             signIn();
           }}
         >
           Iniciar sesión
-        </button>
+        </Button>
       )}
     </DashScreen>
   );
