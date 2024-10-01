@@ -40,6 +40,7 @@ export const otsRouter = createTRPCRouter({
       const selfId = ctx.session.user.id;
       const ot = await db.query.ots.findFirst({
         with: {
+          interventions: true,
           templateId: true,
         },
         where: eq(schema.ots.Id, input.Id),
@@ -54,14 +55,7 @@ export const otsRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const interventions = await db.query.interventions.findMany({
-        where: and(eq(schema.interventions.orgId, ot.orgId), eq(schema.interventions.otId, ot.Id)),
-      });
-
-      return {
-        ot,
-        interventions,
-      };
+      return ot;
     }),
   listOrg: protectedProcedure.input(z.object({ orgId: z.string().min(1).max(1023) })).query(async ({ ctx, input }) => {
     const selfId = ctx.session.user.id;

@@ -22,6 +22,7 @@ import { utapi } from "~/server/uploadthing";
 import { UTFile } from "uploadthing/server";
 import { nanoid } from "nanoid";
 import { otCreateSchema, otEditSchema } from "~/server/api/routers/ots_router";
+import { intervEditSchema, intervSetStatusSchema } from "~/server/api/routers/intervention_router";
 
 type HonoVariables = {
   uid: string;
@@ -103,6 +104,16 @@ app.get("/p/org/:orgId", async (c) => {
 app.get("/p/org/list", async (c) => {
   const api = await getApi();
   return c.json(await api.org.list());
+});
+
+app.get("/p/org/usuario/:orgId/:userId", async (c) => {
+  const api = await getApi();
+  return c.json(
+    await api.org.getUser({
+      orgId: c.req.param("orgId"),
+      userId: c.req.param("userId"),
+    }),
+  );
 });
 
 app.get("/p/org/usuarios/:orgId", async (c) => {
@@ -374,6 +385,26 @@ app.post("/p/ot", zValidator("json", otEditSchema), async (c) => {
 app.delete("/p/ot/:Id", async (c) => {
   const api = await getApi();
   return c.json(await api.ots.delete({ id: c.req.param("Id") }));
+});
+
+app.get("/p/intervention/:intId", async (c) => {
+  const api = await getApi();
+  return c.json(await api.interventions.get({ intId: c.req.param("intId") }));
+});
+
+app.post("/p/intervention/status", zValidator('json', intervSetStatusSchema), async (c) => {
+  const api = await getApi();
+  return c.json(await api.interventions.setStatus(c.req.valid('json')));
+});
+
+app.get("/p/intervention/list/:orgId", async (c) => {
+  const api = await getApi();
+  return c.json(await api.interventions.list({ orgId: c.req.param("orgId") }));
+});
+
+app.post("/p/intervention", zValidator('json', intervEditSchema), async (c) => {
+  const api = await getApi();
+  return c.json(await api.interventions.edit(c.req.valid('json')));
 });
 
 const putFileSchema = z.object({

@@ -92,7 +92,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     </Button>
                     <Button asChild className="text-1xl h-12">
                       <Link href="/dashboard/ots">
-                        <PersonStanding className="mr-2 h-4 w-4" /> Órdenes de trabajo
+                        <BriefcaseBusiness className="mr-2 h-4 w-4" /> Órdenes de trabajo
+                      </Link>
+                    </Button>
+                    <Button asChild className="text-1xl h-12">
+                      <Link href="/dashboard/intervenciones">
+                        <PersonStanding className="mr-2 h-4 w-4" /> Intervenciones
                       </Link>
                     </Button>
                   </>

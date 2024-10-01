@@ -272,6 +272,53 @@ export const orgRouter = createTRPCRouter({
 
     return orgs.map((v) => v.organizacion);
   }),
+  getUser: protectedProcedure
+    .input(
+      z.object({
+        orgId: z.string(),
+        userId: z.string(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      const selfId = ctx.session.user.id;
+      const selfUserB = await db.query.users.findFirst({
+        where: eq(schema.users.Id, selfId),
+      });
+      if (!selfUserB) {
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+      }
+
+      const orgUserEntry = await db.query.usuariosOrganizaciones.findFirst({
+        where: and(eq(schema.usuariosOrganizaciones.orgId, input.orgId), eq(schema.usuariosOrganizaciones.userId, selfId)),
+      });
+
+      if (!orgUserEntry) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const orgUser = await db.query.usuariosOrganizaciones.findFirst({
+        with: {
+          user: true
+        },
+        where: and(
+          eq(schema.usuariosOrganizaciones.orgId, input.orgId),
+          eq(schema.usuariosOrganizaciones.userId, input.userId),
+        ),
+      });
+
+      if (!orgUser) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return {
+        profile: getUserPublic(orgUser.user),
+        orgUser: {
+          userId: orgUser.userId,
+          orgId: orgUser.orgId,
+          rol: orgUser.rol
+        }
+      }
+    }),
   listUsers: protectedProcedure
     .input(
       z.object({

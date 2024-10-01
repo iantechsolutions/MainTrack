@@ -8,7 +8,6 @@ import Link from "next/link";
 import { OtTypeText } from "~/server/utils/ot_types";
 
 export default function OtsList({ ots }: { ots: InferSelectModel<typeof schema.ots>[] }) {
-  console.log(ots);
   return (
     <>
       {ots.map((u) => (

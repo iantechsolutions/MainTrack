@@ -98,6 +98,7 @@ export const equiposRelations = relations(equipment, ({ one, many }) => ({
   }),
   photos: many(equipmentPhotos),
   ots: many(ots),
+  documents: many(documents),
 }));
 
 export const equipmentCategories = createTable("equipmentCategories", {
@@ -251,7 +252,7 @@ export const interventions = createTable("interventions", {
   limitDate: ts("limitDate")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  status: text("status"),
+  status: text("status").notNull(),
   orgId: uuid("orgId")
     .notNull()
     .references(() => organizaciones.Id),
