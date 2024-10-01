@@ -64,7 +64,7 @@ export const equipRouter = createTRPCRouter({
       const equip = await db.query.equipment.findFirst({
         with: {
           documents: true,
-          photos: true
+          photos: true,
         },
         where: eq(schema.equipment.Id, input.equipId),
       });

@@ -8,7 +8,13 @@ import { IntStatusText } from "~/server/utils/intervention_status";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 
-export default function IntsList({ ints, asignados }: { ints: InferSelectModel<typeof schema.interventions>[], asignados: Map<string, UserPublic> }) {
+export default function IntsList({
+  ints,
+  asignados,
+}: {
+  ints: InferSelectModel<typeof schema.interventions>[];
+  asignados: Map<string, UserPublic>;
+}) {
   return (
     <>
       {ints.map((u) => (
@@ -17,7 +23,10 @@ export default function IntsList({ ints, asignados }: { ints: InferSelectModel<t
           <p> Intervención Status: {IntStatusText[u.status]}</p>
           <p> Intervención Limit Date: {u.limitDate.toLocaleDateString()}</p>
           <p> Intervención OT ID: {u.otId}</p>
-          <p> Intervención Asignado: {asignados.get(u.userId)?.username} ({u.userId})</p>
+          <p>
+            {" "}
+            Intervención Asignado: {asignados.get(u.userId)?.username} ({u.userId})
+          </p>
           <Link href={`/dashboard/intervenciones/${u.Id}`}>
             <Button>Detalle</Button>
           </Link>

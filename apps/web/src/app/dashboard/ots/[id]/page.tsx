@@ -30,13 +30,20 @@ export default async function Page({ params }: { params: { id: string } }) {
       <p> Equipo ID: {u.equipoId ?? "null"}</p>
       <p> Template ID: {u.templateId ?? "null"}</p>
       <p> Fecha último uso template: {u.templateLastUsed?.toLocaleDateString() ?? "null"}</p>
-      {interv === null ? <p>No hay intervenciones</p> : <>
-        <p> Intervención ID: {interv.Id}</p>
-        <p> Intervención Status: {IntStatusText[interv.status]}</p>
-        <p> Intervención Limit Date: {interv.limitDate.toLocaleDateString()}</p>
-        <p> Intervención OT ID: {interv.otId}</p>
-        <p> Intervención Asignado: {asignado?.profile.username} ({interv.userId})</p>
-      </>}
+      {interv === null ? (
+        <p>No hay intervenciones</p>
+      ) : (
+        <>
+          <p> Intervención ID: {interv.Id}</p>
+          <p> Intervención Status: {IntStatusText[interv.status]}</p>
+          <p> Intervención Limit Date: {interv.limitDate.toLocaleDateString()}</p>
+          <p> Intervención OT ID: {interv.otId}</p>
+          <p>
+            {" "}
+            Intervención Asignado: {asignado?.profile.username} ({interv.userId})
+          </p>
+        </>
+      )}
     </DashScreen>
   );
 }

@@ -33,8 +33,14 @@ export default async function Page({ params }: { params: { id: string } }) {
       <p> Intervención ID: {interv.Id}</p>
       <p> Intervención Status: {IntStatusText[interv.status]}</p>
       <p> Intervención Limit Date: {interv.limitDate.toLocaleDateString()}</p>
-      <p> Intervención OT: {ot.name} ({interv.otId})</p>
-      <p> Intervención Asignado: {asignado.profile.username} ({interv.userId})</p>
+      <p>
+        {" "}
+        Intervención OT: {ot.name} ({interv.otId})
+      </p>
+      <p>
+        {" "}
+        Intervención Asignado: {asignado.profile.username} ({interv.userId})
+      </p>
     </DashScreen>
   );
 }

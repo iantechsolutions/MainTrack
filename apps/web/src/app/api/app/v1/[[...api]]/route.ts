@@ -392,9 +392,9 @@ app.get("/p/intervention/:intId", async (c) => {
   return c.json(await api.interventions.get({ intId: c.req.param("intId") }));
 });
 
-app.post("/p/intervention/status", zValidator('json', intervSetStatusSchema), async (c) => {
+app.post("/p/intervention/status", zValidator("json", intervSetStatusSchema), async (c) => {
   const api = await getApi();
-  return c.json(await api.interventions.setStatus(c.req.valid('json')));
+  return c.json(await api.interventions.setStatus(c.req.valid("json")));
 });
 
 app.get("/p/intervention/list/:orgId", async (c) => {
@@ -402,9 +402,9 @@ app.get("/p/intervention/list/:orgId", async (c) => {
   return c.json(await api.interventions.list({ orgId: c.req.param("orgId") }));
 });
 
-app.post("/p/intervention", zValidator('json', intervEditSchema), async (c) => {
+app.post("/p/intervention", zValidator("json", intervEditSchema), async (c) => {
   const api = await getApi();
-  return c.json(await api.interventions.edit(c.req.valid('json')));
+  return c.json(await api.interventions.edit(c.req.valid("json")));
 });
 
 const putFileSchema = z.object({

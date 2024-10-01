@@ -21,7 +21,7 @@ export const appRouter = createTRPCRouter({
   eqType: eqTypeRouter,
   equip: equipRouter,
   ots: otsRouter,
-  interventions: interventionsRouter
+  interventions: interventionsRouter,
 });
 
 export const createCaller = createCallerFactory(appRouter);

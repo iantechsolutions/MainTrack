@@ -298,12 +298,9 @@ export const orgRouter = createTRPCRouter({
 
       const orgUser = await db.query.usuariosOrganizaciones.findFirst({
         with: {
-          user: true
+          user: true,
         },
-        where: and(
-          eq(schema.usuariosOrganizaciones.orgId, input.orgId),
-          eq(schema.usuariosOrganizaciones.userId, input.userId),
-        ),
+        where: and(eq(schema.usuariosOrganizaciones.orgId, input.orgId), eq(schema.usuariosOrganizaciones.userId, input.userId)),
       });
 
       if (!orgUser) {
@@ -315,9 +312,9 @@ export const orgRouter = createTRPCRouter({
         orgUser: {
           userId: orgUser.userId,
           orgId: orgUser.orgId,
-          rol: orgUser.rol
-        }
-      }
+          rol: orgUser.rol,
+        },
+      };
     }),
   listUsers: protectedProcedure
     .input(
