@@ -5,6 +5,7 @@ import { DashScreen } from "~/components/screen";
 import { getApi } from "~/trpc/server";
 import { EquipmentStatusText } from "~/server/utils/equipment_status";
 import EquipoQr from "./qr";
+import FileUpload from "~/components/fileupload";
 
 export default async function Page({ params }: { params: { id: string } }) {
   const api = await getApi();
@@ -33,6 +34,10 @@ export default async function Page({ params }: { params: { id: string } }) {
       <p>
         Categoría: {category.Id} ({category.name})
       </p>
+      <div>
+        <p>Subir documento: </p>
+        <FileUpload id="doc"/>
+      </div>
       <EquipoQr />
     </DashScreen>
   );

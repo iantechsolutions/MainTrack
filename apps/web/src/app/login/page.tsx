@@ -6,6 +6,9 @@ import { Button } from "~/components/ui/button";
 
 export default function LogIn() {
   const { data: session } = useSession();
+  if (session !== null) {
+    document.location.href = "../";
+  }
 
   return (
     <DashScreen>

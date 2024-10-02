@@ -73,6 +73,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <BriefcaseBusiness className="mr-2 h-4 w-4" /> Organizaciones
                   </Link>
                 </Button>
+                <Button asChild className="text-1xl h-12">
+                  <Link href="/dashboard/pagos">
+                    <BriefcaseBusiness className="mr-2 h-4 w-4" /> Pagos/Suscripción
+                  </Link>
+                </Button>
                 {userData.profile.orgSel !== null ? (
                   <>
                     <Button asChild className="text-1xl h-12">

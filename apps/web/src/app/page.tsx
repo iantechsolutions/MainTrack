@@ -1,24 +1,28 @@
 import React from "react";
+import NoOrgPage from "~/components/noorg";
 import { DashScreen } from "~/components/screen";
-// import { getBaseUrl } from '~/server/utils/other';
+import { getAuthId } from "~/lib/utils";
+import { getApi } from "~/trpc/server";
 
 export default async function Home() {
-  // const url = `${getBaseUrl()}/api/app/v1/p/test`;
-  // let useAuth = auth();
-  // let token = await useAuth.getToken();
-  // console.log(url);
-  // console.log(token);
-
-  // const testHono = await (await fetch(url, { headers: [['Authorization', `Bearer ${await useAuth.getToken()}`]] })).text();
-  // console.log(testHono);
+  const auth = await getAuthId();
+  const isLoggedIn = typeof auth === "string";
+  const api = await getApi();
+  const userData = isLoggedIn
+    ? {
+        profile: await api.user.get(),
+      }
+    : null;
+  
+  if (userData === null) {
+    document.location.href = "./login";
+  } else if (typeof userData.profile.orgSel !== 'string') {
+    return <NoOrgPage />
+  }
 
   return (
     <DashScreen>
       <p>Hola</p>
-      {/* <a href="/dashboard">Dashboard {testHono}</a> */}
-      {/* <SignInButton></SignInButton>
-      <SignOutButton></SignOutButton>
-      <UserButton></UserButton> */}
     </DashScreen>
   );
 }
