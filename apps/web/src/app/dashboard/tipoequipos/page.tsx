@@ -2,6 +2,8 @@ import React from "react";
 import { getApi } from "~/trpc/server";
 import TipoEquipoNew from "./new";
 import { DashScreen } from "~/components/screen";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
 
 export default async function TipoEquipos() {
   const api = await getApi();
@@ -24,6 +26,9 @@ export default async function TipoEquipos() {
         <div key={v.Id}>
           <p>Tipo de equipo: {v.name}</p>
           <p>Descripción: {v.description}</p>
+          <Link href={`/dashboard/tipoequipos/${v.Id}`}>
+            <Button>Ver</Button>
+          </Link>
         </div>
       ))}
     </DashScreen>

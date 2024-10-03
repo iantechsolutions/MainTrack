@@ -28,8 +28,6 @@ export default async function Page({ params }: { params: { id: string } }) {
     uploadedBefore: null
   });
 
-  console.log(docs);
-
   return (
     <DashScreen>
       <p>Id: {equipo.Id}</p>
