@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import React from "react";
 import NoOrgPage from "~/components/noorg";
 import { DashScreen } from "~/components/screen";
@@ -14,9 +15,7 @@ export default async function Home() {
       }
     : null;
   
-  if (userData === null) {
-    document.location.href = "./login";
-  } else if (typeof userData.profile.orgSel !== 'string') {
+  if (typeof userData?.profile.orgSel !== 'string') {
     return <NoOrgPage />
   }
 

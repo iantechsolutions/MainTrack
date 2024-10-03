@@ -1,7 +1,6 @@
 // import 'server-only';
-import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
-import { z } from "zod";
+import { Context, Hono } from "hono";
+import { z, ZodSchema } from "zod";
 import { getApi } from "~/trpc/server";
 import { authLoginSchema, authSignupSchema } from "~/server/api/routers/auth";
 import { editSelfSchema } from "~/server/api/routers/user_router";
@@ -28,6 +27,16 @@ type HonoVariables = {
   uid: string;
 };
 
+async function zValidate<Out>(c: Context<{Variables: HonoVariables}>, schema: ZodSchema<Out>, cb: (data: Out) => Promise<void | Response>) {
+  const json = await c.req.json();
+  const result = await schema.safeParseAsync(json);
+  if (!result.success) {
+    return c.json(result, 400);
+  } else {
+    return await cb(result.data);
+  }
+}
+
 // export const runtime = 'edge';
 const app = new Hono<{ Variables: HonoVariables }>().basePath("/api/app/v1");
 
@@ -49,15 +58,19 @@ app.get("/p/test", async (c) => {
   return c.text("'hono test'");
 });
 
-app.post("/signup", zValidator("json", authSignupSchema), async (c) => {
-  const api = await getApi();
-  return c.json(api.auth.signUp(c.req.valid("json")));
+app.post("/signup", async (c) => {
+  return await zValidate(c, authSignupSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.auth.signUp(body));
+  });
 });
 
 // Usar endpoints de nextauth
-app.post("/login", zValidator("json", authLoginSchema), async (c) => {
-  const api = await getApi();
-  return c.json(api.auth.logIn(c.req.valid("json")));
+app.post("/login", async (c) => {
+  return await zValidate(c, authLoginSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.auth.logIn(body));
+  });
 });
 
 // users
@@ -67,29 +80,37 @@ app.get("/p/user", async (c) => {
   return c.json(await api.user.get());
 });
 
-app.post("/p/user", zValidator("json", editSelfSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.user.editSelf(c.req.valid("json")));
+app.post("/p/user", async (c) => {
+  return await zValidate(c, editSelfSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.user.editSelf(body));
+  });
 });
 
 // orgs
-app.put("/p/org", zValidator("json", schemaOrgPut), async (c) => {
-  const api = await getApi();
-  return c.json(await api.org.create(c.req.valid("json")));
+app.put("/p/org", async (c) => {
+  return await zValidate(c, schemaOrgPut, async (body) => {
+    const api = await getApi();
+    return c.json(api.org.create(body));
+  });
 });
 
-app.patch("/p/org", zValidator("json", schemaOrgPatch), async (c) => {
-  const api = await getApi();
-  return c.json(await api.org.edit(c.req.valid("json")));
+app.patch("/p/org", async (c) => {
+  return await zValidate(c, schemaOrgPatch, async (body) => {
+    const api = await getApi();
+    return c.json(api.org.edit(body));
+  });
 });
 
 const schemaOrgDel = z.object({
   orgId: z.string(),
 });
 
-app.delete("/p/org", zValidator("json", schemaOrgDel), async (c) => {
-  const api = await getApi();
-  return c.text(await api.org.delete(c.req.valid("json")));
+app.delete("/p/org", async (c) => {
+  return await zValidate(c, schemaOrgDel, async (body) => {
+    const api = await getApi();
+    return c.json(api.org.delete(body));
+  });
 });
 
 app.get("/p/org/:orgId", async (c) => {
@@ -125,9 +146,11 @@ app.get("/p/org/usuarios/:orgId", async (c) => {
   );
 });
 
-app.post("/p/org/invite", zValidator("json", schemaOrgInvite), async (c) => {
-  const api = await getApi();
-  return c.text(await api.org.inviteUser(c.req.valid("json")));
+app.post("/p/org/invite", async (c) => {
+  return await zValidate(c, schemaOrgInvite, async (body) => {
+    const api = await getApi();
+    return c.json(api.org.inviteUser(body));
+  });
 });
 
 app.get("/p/org/join/:token", async (c) => {
@@ -149,9 +172,11 @@ app.get("/p/org/remove/:userId/:orgId", async (c) => {
   );
 });
 
-app.post("/p/org/setrole", zValidator("json", schemaOrgSetRole), async (c) => {
-  const api = await getApi();
-  return c.json(await api.org.setRole(c.req.valid("json")));
+app.post("/p/org/setrole", async (c) => {
+  return await zValidate(c, schemaOrgSetRole, async (body) => {
+    const api = await getApi();
+    return c.json(api.org.setRole(body));
+  });
 });
 
 app.get("/p/org/select/:orgId", async (c) => {
@@ -163,9 +188,11 @@ app.get("/p/org/select/:orgId", async (c) => {
   );
 });
 
-app.put("/p/doc", zValidator("json", docCreateSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.doc.create(c.req.valid("json")));
+app.put("/p/doc", async (c) => {
+  return await zValidate(c, docCreateSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.doc.create(body));
+  });
 });
 
 app.delete("/p/doc/:docId", async (c) => {
@@ -187,14 +214,18 @@ app.get("/p/doc/:docId", async (c) => {
 });
 
 // post porque los argumentos son un choclazo
-app.post("/p/doc/list", zValidator("json", docListSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.doc.listFiltered(c.req.valid("json")));
+app.post("/p/doc/list", async (c) => {
+  return await zValidate(c, docListSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.doc.listFiltered(body));
+  });
 });
 
-app.put("/p/doctype", zValidator("json", docTypeCreateSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.docType.create(c.req.valid("json")));
+app.put("/p/doctype", async (c) => {
+  return await zValidate(c, docTypeCreateSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.docType.create(body));
+  });
 });
 
 app.delete("/p/doctype/:docTypeId", async (c) => {
@@ -218,14 +249,18 @@ app.get("/p/doctype/:orgId", async (c) => {
 
 // lista filtrada
 // post porque los argumentos son un choclazo
-app.post("/p/doctype/list", zValidator("json", docTypeListSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.docType.listFiltered(c.req.valid("json")));
+app.post("/p/doctype/list", async (c) => {
+  return await zValidate(c, docTypeListSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.docType.listFiltered(body));
+  });
 });
 
-app.put("/p/eqtype", zValidator("json", eqTypeCreateSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.eqType.create(c.req.valid("json")));
+app.put("/p/eqtype", async (c) => {
+  return await zValidate(c, eqTypeCreateSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.eqType.create(body));
+  });
 });
 
 app.delete("/p/eqtype/:eqTypeId", async (c) => {
@@ -257,14 +292,18 @@ app.get("/p/eqtype/list/:orgId", async (c) => {
 
 // lista filtrada
 // post porque los argumentos son un choclazo, para ponerlos en el body
-app.post("/p/eqtype/list", zValidator("json", eqTypeListSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.eqType.listFiltered(c.req.valid("json")));
+app.post("/p/eqtype/list", async (c) => {
+  return await zValidate(c, eqTypeListSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.eqType.listFiltered(body));
+  });
 });
 
-app.put("/p/equipment", zValidator("json", equipCreateSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.equip.create(c.req.valid("json")));
+app.put("/p/equipment", async (c) => {
+  return await zValidate(c, equipCreateSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.equip.create(body));
+  });
 });
 
 app.delete("/p/equipment/:eqId", async (c) => {
@@ -294,27 +333,35 @@ app.get("/p/equipment/list/:orgId", async (c) => {
   );
 });
 
-app.patch("/p/equipment/status", zValidator("json", equipEditStatusSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.equip.editStatus(c.req.valid("json")));
+app.patch("/p/equipment/status", async (c) => {
+  return await zValidate(c, equipEditStatusSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.equip.editStatus(body));
+  });
 });
 
-app.patch("/p/equipment/location", zValidator("json", equipEditLocationSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.equip.editLoc(c.req.valid("json")));
+app.patch("/p/equipment/location", async (c) => {
+  return await zValidate(c, equipEditLocationSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.equip.editLoc(body));
+  });
 });
 
 // lista filtrada
 // post porque los argumentos son un choclazo, para ponerlos en el body
-app.post("/p/equipment/list", zValidator("json", equipListSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.equip.listFiltered(c.req.valid("json")));
+app.post("/p/equipment/list", async (c) => {
+  return await zValidate(c, equipListSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.equip.listFiltered(body));
+  });
 });
 
 // ver /p/file
-app.post("/p/equipment/photo", zValidator("json", equipPhotoPutSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.equip.photoPut(c.req.valid("json")));
+app.post("/p/equipment/photo", async (c) => {
+  return await zValidate(c, equipPhotoPutSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.equip.photoPut(body));
+  });
 });
 
 app.delete("/p/equipment/photo/:Id", async (c) => {
@@ -371,15 +418,19 @@ app.get("/p/ot/list/equip/:equipId", async (c) => {
   );
 });
 
-app.put("/p/ot", zValidator("json", otCreateSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.ots.create(c.req.valid("json")));
+app.put("/p/ot", async (c) => {
+  return await zValidate(c, otCreateSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.ots.create(body));
+  });
 });
 
 // edit
-app.post("/p/ot", zValidator("json", otEditSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.ots.edit(c.req.valid("json")));
+app.post("/p/ot", async (c) => {
+  return await zValidate(c, otEditSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.ots.edit(body));
+  });
 });
 
 app.delete("/p/ot/:Id", async (c) => {
@@ -392,9 +443,11 @@ app.get("/p/intervention/:intId", async (c) => {
   return c.json(await api.interventions.get({ intId: c.req.param("intId") }));
 });
 
-app.post("/p/intervention/status", zValidator("json", intervSetStatusSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.interventions.setStatus(c.req.valid("json")));
+app.post("/p/intervention/status", async (c) => {
+  return await zValidate(c, intervSetStatusSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.interventions.setStatus(body));
+  });
 });
 
 app.get("/p/intervention/list/:orgId", async (c) => {
@@ -402,9 +455,11 @@ app.get("/p/intervention/list/:orgId", async (c) => {
   return c.json(await api.interventions.list({ orgId: c.req.param("orgId") }));
 });
 
-app.post("/p/intervention", zValidator("json", intervEditSchema), async (c) => {
-  const api = await getApi();
-  return c.json(await api.interventions.edit(c.req.valid("json")));
+app.post("/p/intervention", async (c) => {
+  return await zValidate(c, intervEditSchema, async (body) => {
+    const api = await getApi();
+    return c.json(api.interventions.edit(body));
+  });
 });
 
 const putFileSchema = z.object({
@@ -413,28 +468,28 @@ const putFileSchema = z.object({
 });
 
 // upload archivo generico base64
-app.put("/p/file", zValidator("json", putFileSchema), async (c) => {
-  const data = c.req.valid("json");
+app.put("/p/file", async (c) => {
+  return await zValidate(c, putFileSchema, async (data) => {
+    const decoded = atob(data.data64);
+    /* const byteArray = new Uint8Array(decoded.length);
+    for (let i = 0; i < decoded.length; i++) {
+      byteArray[i] = decoded.charCodeAt(i);
+    } */
 
-  const decoded = atob(data.data64);
-  /* const byteArray = new Uint8Array(decoded.length);
-  for (let i = 0; i < decoded.length; i++) {
-    byteArray[i] = decoded.charCodeAt(i);
-  } */
-
-  const file = new UTFile([decoded], data.filename ?? `${nanoid()}.file`);
-  const res = await utapi.uploadFiles([file]);
-  return c.json(
-    res.map((file) => {
-      return {
-        name: file.data?.name,
-        url: file.data?.url,
-        size: file.data?.size,
-        type: file.data?.type,
-        error_code: file.error?.code,
-      };
-    }),
-  );
+    const file = new UTFile([decoded], data.filename ?? `${nanoid()}.file`);
+    const res = await utapi.uploadFiles([file]);
+    return c.json(
+      res.map((file) => {
+        return {
+          name: file.data?.name,
+          url: file.data?.url,
+          size: file.data?.size,
+          type: file.data?.type,
+          error_code: file.error?.code,
+        };
+      }),
+    );
+  });
 });
 
 export const GET = app.fetch;

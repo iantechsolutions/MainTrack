@@ -163,7 +163,7 @@ export const docRouter = createTRPCRouter({
     }
 
     if (input.equipmentId) {
-      conditions.push(eq(schema.documents.equCategoryId, input.equipmentId));
+      conditions.push(eq(schema.documents.equipmentId, input.equipmentId));
     }
 
     if (typeof input.uploadedAfter === "number") {
