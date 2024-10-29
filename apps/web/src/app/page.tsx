@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import React from "react";
 import NoOrgPage from "~/components/noorg";
 import { DashScreen } from "~/components/screen";

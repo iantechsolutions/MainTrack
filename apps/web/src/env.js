@@ -19,6 +19,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string().refine((str) => str !== "example"),
     NEXTAUTH_URL: z.string().refine((str) => str !== "https://example.com"),
     UPLOADTHING_TOKEN: z.string().refine((str) => str !== "example"),
+    // STRIPE_SECRET_KEY: z.string().refine((str) => str !== "example"),
+    // STRIPE_WEBHOOK_SECRET: z.string().refine((str) => str !== "example"),
   },
 
   /**
@@ -28,6 +30,7 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_TEST: z.string(),
+    // NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string().refine((str) => str !== "example"),
   },
 
   /**
@@ -36,8 +39,10 @@ export const env = createEnv({
    */
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
+    // STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
     NODE_ENV: process.env.NODE_ENV,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    // NEXT_PUBLIC_STRIPE_PUBLIC_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
     NEXT_PUBLIC_TEST: process.env.NEXT_PUBLIC_TEST,
     JWT_INVITE_KEY: process.env.JWT_INVITE_KEY,
     DATABASE_AUTH_TOKEN: process.env.DATABASE_AUTH_TOKEN,
@@ -45,6 +50,7 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
+    // STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
